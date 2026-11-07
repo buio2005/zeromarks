@@ -1,5 +1,7 @@
 // @ts-check
 
+import { t } from "../../shared/i18n/i18n.js";
+
 import {
   DeleteNode,
   DeleteNodes,
@@ -96,15 +98,15 @@ export function triggerDeleteShortcut() {
   if (selectedNodes.length > 1) {
     const label = isFolderNode(selectedNodes[0]) ? "Folders" : "Bookmarks";
     uiState.actions.showConfirm(
-      `Delete ${label}`,
-      `Delete ${selectedNodes.length} selected ${label.toLowerCase()}?`,
+      t("Delete {label}", { label: t(label) }),
+      t("Delete {count} selected {label}?", { count: selectedNodes.length, label: t(label.toLowerCase()) }),
       "Delete",
       async () => {
         try {
           await DeleteNodes(treeState.selectors.getSelectedNodeIds());
           treeState.actions.clearSelection();
           await treeState.actions.refresh();
-          uiState.actions.showToast(`${selectedNodes.length} ${label.toLowerCase()} deleted`, "success");
+          uiState.actions.showToast(t("{count} {label} deleted", { count: selectedNodes.length, label: t(label.toLowerCase()) }), "success");
         } catch (caughtError) {
           uiState.actions.showToast(getErrorMessage(caughtError, "Bulk delete failed"), "error");
         }
@@ -119,8 +121,8 @@ export function triggerDeleteShortcut() {
     : selectedNode.bookmark.title || selectedNode.bookmark.url;
   const noun = isFolderNode(selectedNode) ? "Folder" : "Bookmark";
   const message = isFolderNode(selectedNode)
-    ? `Delete "${title}" and all of its contents?`
-    : `Delete "${title}"?`;
+    ? t('Delete "{title}" and all of its contents?', { title })
+    : t('Delete "{title}"?', { title });
   uiState.actions.showConfirm(
     `Delete ${noun}`,
     message,

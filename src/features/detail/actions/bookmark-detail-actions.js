@@ -1,5 +1,7 @@
 // @ts-check
 
+import { t } from "../../../shared/i18n/i18n.js";
+
 import {
   DeleteNode,
   FetchFavicon,
@@ -110,7 +112,7 @@ export function createBookmarkDetailActions(options) {
   function showDeleteConfirm() {
     uiState.actions.showConfirm(
       "Delete Bookmark",
-      `Delete "${bookmark.bookmark.title}"?`,
+      t('Delete "{title}"?', { title: bookmark.bookmark.title }),
       "Delete",
       async () => {
         try {

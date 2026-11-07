@@ -93,15 +93,15 @@ export function createBulkSelectionDetail() {
     const selectionLabel = getSelectionLabel();
 
     uiState.actions.showConfirm(
-      `Delete ${selectionLabel}`,
-      `Delete ${selectionCount} selected ${selectionLabel.toLowerCase()}?`,
+      t("Delete {label}", { label: t(selectionLabel) }),
+      t("Delete {count} selected {label}?", { count: selectionCount, label: t(selectionLabel.toLowerCase()) }),
       "Delete",
       async () => {
         runningAction("delete");
         try {
           await DeleteNodes(treeState.selectors.getSelectedNodeIds());
           treeState.actions.clearSelection();
-          await refreshAfterAction(`${selectionCount} ${selectionLabel.toLowerCase()} deleted`);
+          await refreshAfterAction(t("{count} {label} deleted", { count: selectionCount, label: t(selectionLabel.toLowerCase()) }));
         } catch (caughtError) {
           uiState.actions.showToast(getErrorMessage(caughtError, "Bulk delete failed"), "error");
         } finally {

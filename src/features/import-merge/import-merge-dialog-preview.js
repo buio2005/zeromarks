@@ -30,8 +30,8 @@ export function buildImportMergePreviewSections(preview) {
   return [
     {
       key: "folders",
-      title: "Folders to add",
-      shortLabel: "Folders",
+      title: t("Folders to add"),
+      shortLabel: t("Folders"),
       count: preview.foldersToAdd.length,
       tone: "success",
       emptyMessage: "No new folders will be created.",
@@ -42,34 +42,34 @@ export function buildImportMergePreviewSections(preview) {
     },
     {
       key: "bookmarks",
-      title: "Bookmarks to add",
-      shortLabel: "Bookmarks",
+      title: t("Bookmarks to add"),
+      shortLabel: t("Bookmarks"),
       count: preview.bookmarksToAdd.length,
       tone: "success",
       emptyMessage: "No new bookmarks will be added.",
       rows: preview.bookmarksToAdd.map((item) => ({
         primary: item.title || item.url,
         secondary: item.url,
-        meta: item.folderPath || "Root",
+        meta: item.folderPath || t("Root"),
       })),
     },
     {
       key: "duplicates",
-      title: "Duplicates ignored",
-      shortLabel: "Duplicates",
+      title: t("Duplicates ignored"),
+      shortLabel: t("Duplicates"),
       count: preview.duplicateBookmarks.length,
       tone: "muted",
       emptyMessage: "No duplicates were detected.",
       rows: preview.duplicateBookmarks.map((item) => ({
         primary: item.title || item.url,
         secondary: item.url,
-        meta: item.folderPath || "Root",
+        meta: item.folderPath || t("Root"),
       })),
     },
     {
       key: "updates",
-      title: "Existing matches",
-      shortLabel: "Matches",
+      title: t("Existing matches"),
+      shortLabel: t("Matches"),
       count: preview.potentialUpdates.length,
       tone: "warning",
       emptyMessage: "No existing matches were found.",
@@ -135,8 +135,8 @@ export function mountImportMergePreview(host, preview, previewLoading) {
   const navHeader = document.createElement("div");
   navHeader.className = "import-merge-dialog__nav-header";
   navHeader.innerHTML = /*html*/ `
-    <div class="eyebrow import-merge-dialog__nav-eyebrow">Preview</div>
-    <h3 class="import-merge-dialog__nav-title">Review changes</h3>
+    <div class="eyebrow import-merge-dialog__nav-eyebrow">${t("Preview")}</div>
+    <h3 class="import-merge-dialog__nav-title">${t("Review changes")}</h3>
   `;
 
   const navList = document.createElement("div");
@@ -199,8 +199,8 @@ function createLoadingCard() {
   const copy = document.createElement("div");
   copy.className = "import-merge-dialog__loading-copy";
   copy.innerHTML = /*html*/ `
-    <strong class="import-merge-dialog__loading-title">Computing merge preview</strong>
-    <span class="import-merge-dialog__loading-text">Scanning the imported bookmark file for additive changes.</span>
+    <strong class="import-merge-dialog__loading-title">${t("Computing merge preview")}</strong>
+    <span class="import-merge-dialog__loading-text">${t("Scanning the imported bookmark file for additive changes.")}</span>
   `;
 
   loadingCard.append(spinner, copy);
@@ -214,10 +214,10 @@ function createEmptyState() {
   const emptyState = document.createElement("section");
   emptyState.className = "panel import-merge-dialog__empty-state";
   emptyState.innerHTML = /*html*/ `
-    <div class="eyebrow import-merge-dialog__empty-eyebrow">Preview</div>
-    <h3 class="import-merge-dialog__empty-title">Choose a bookmark file to compare</h3>
+    <div class="eyebrow import-merge-dialog__empty-eyebrow">${t("Preview")}</div>
+    <h3 class="import-merge-dialog__empty-title">${t("Choose a bookmark file to compare")}</h3>
     <p class="import-merge-dialog__empty-copy">
-      The preview will show folders and bookmarks to add, duplicates to ignore, and links already in your library.
+      ${t("The preview will show folders and bookmarks to add, duplicates to ignore, and links already in your library.")}
     </p>
   `;
   return emptyState;

@@ -1,6 +1,6 @@
 [package]
 name = "zeromarks"
-version = "1.0.0"
+version = "1.0.1"
 description = "ZeroMarks: a private, local bookmark manager"
 authors = ["Sellsword Software", "TivuStream"]
 edition = "2021"

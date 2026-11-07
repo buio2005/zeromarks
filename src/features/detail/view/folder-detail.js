@@ -138,7 +138,7 @@ export function createFolderDetail(folder) {
         function showDeleteConfirm() {
           uiState.actions.showConfirm(
             "Delete Folder",
-            `Delete "${currentName()}" and all of its contents?`,
+            t('Delete "{title}" and all of its contents?', { title: currentName() }),
             "Delete",
             async () => {
               try {

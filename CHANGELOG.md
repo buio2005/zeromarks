@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.1]
+
+### Fixed
+
+- Ctrl+Shift+F (fetch site icons) is no longer intercepted by Ctrl+F (search)
+- Italian interface: the Import and Merge preview (section titles, counters, "Review changes") and the delete confirmations are now translated
+
 ## [1.0.0] ZeroMarks (TivuStream) – first release
 
 Renamed to **ZeroMarks** (identifier `it.tivustream.zeromarks`). Based on JustBookmarks 0.3.x by SellswordSoftware.
