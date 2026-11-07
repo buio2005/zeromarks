@@ -190,7 +190,7 @@ export function mountGlobalShortcuts(options) {
       void options.createFile();
       return;
     }
-    if (key === "f") {
+    if (key === "f" && !event.shiftKey) {
       event.preventDefault();
       options.focusSearch();
       return;
