@@ -1,5 +1,6 @@
 // @ts-check
 
+import { t } from "../../shared/i18n/i18n.js";
 import {
   attr,
   effect,
@@ -51,10 +52,10 @@ function createImportMergeDialog(view, onMountElements) {
         const errorBanner = /** @type {HTMLElement} */ (requireRef(ctx.refs, "errorBanner"));
         const errorText = /** @type {HTMLElement} */ (requireRef(ctx.refs, "errorText"));
 
-        filePath.textContent = view.importPath || "No file selected";
-        applyButton.textContent = applyLabel;
+        filePath.textContent = view.importPath || t("No file selected");
+        applyButton.textContent = t(applyLabel);
         errorBanner.hidden = !view.error;
-        errorText.textContent = view.error;
+        errorText.textContent = t(view.error);
 
         ctx.cleanup.add(
           attr(chooseFileButton, "disabled", () => view.previewLoading || view.applyLoading),

@@ -1,177 +1,115 @@
-# JustBookmarks
+<p align="center"><img src="branding/zeromarks-logo.png" alt="ZeroMarks logo" width="280"></p>
 
-`JustBookmarks` is a desktop bookmark manager for people who want one clean, browser-independent source of truth.
+# ZeroMarks
 
-It keeps everything in a plain Netscape Bookmarks HTML file, so you can manage your bookmarks outside any specific browser and import them wherever you want later.
+🇮🇹 [Leggimi in italiano](README.it.md)
 
-![justbookmarks main window](docs/app.png)
+A desktop bookmark manager that keeps **all your bookmarks in one plain file on your computer**, independent of any browser. Organize them once, then import them into whichever browser you use today.
 
-## Download
+ZeroMarks is made by [TivuStream](https://tivustream.com) for its readers, as part of its Zero… family of privacy tools. It is based on
+[JustBookmarks](https://github.com/SellswordSoftware/justbookmarks) by SellswordSoftware, with extra
+features, safety fixes and an Italian interface (see [What's different](#whats-different)).
 
-Prebuilt binaries are available on GitHub Releases:
+![Main window](docs/app.png)
 
-- https://github.com/SellswordSoftware/justbookmarks/releases/latest
+## Your privacy
 
-## Why I Made This
+- **Everything stays on your computer.** Bookmarks are kept in a standard bookmarks HTML file that you choose.
+- **No accounts, no cloud, no statistics, no tracking.** Nothing is uploaded anywhere.
+- **The app goes online only when you ask it to**: to refresh a page title or icon, or to check for dead
+  links. It then contacts only the websites of your own bookmarks. No third-party services are used.
+- The interface itself cannot reach the internet: its security policy blocks every external connection.
 
-I end up switching browsers somewhat regularly: Vivaldi, Zen, Helium, Brave, and whatever else I am trying that month.
+## Features
 
-What I wanted was straightforward:
+- One file, one source of truth: the **Netscape bookmark format** that every browser can import and export
+- Folder tree, instant search, add / edit / move / delete, drag and drop, undo and redo
+- **Import and merge** another bookmark file: links already in your library are recognized, even in other folders
+- **Find duplicates** across the whole library and remove the extra copies (`Ctrl+Shift+D`)
+- **Check for dead links**: pages that no longer exist, sites that moved, links to verify by hand (`Ctrl+Shift+L`)
+- **Sort folders** by name, date added or website, optionally including subfolders
+- **Recent files** menu (`Ctrl+Shift+O`); the last file reopens automatically
+- **Automatic backups** before every save, and safe saving that never leaves a half-written file
+- **Notices changes made by other programs** (sync tools like Syncthing or Dropbox, editors) and lets you reload or keep your version
+- Keeps everything browsers store in the file: tags, keywords, descriptions, toolbar folder
+- **English and Italian** interface (`IT / EN` button in the title bar)
+- Works from the keyboard: press `?` or `F1` for the full list of shortcuts
 
-- one central book of record for my bookmarks
-- an easy way to organize and clean them up
-- a format I could import into basically any browser
+## Download and install
 
-Most of the tools I found were not a good fit.
+Installers for Windows are published on the [Releases page](../../releases/latest).
 
-- Some were online services like `raindrop.io`
-- Some were more complex than I wanted, like `linkwarden`
+Windows may show a blue "Windows protected your PC" (SmartScreen) message, because the installer is not
+code-signed. Click **More info → Run anyway**. The full source code is in this repository.
 
-`JustBookmarks` is meant to be simple but complete. It is not trying to be a research tool, a cloud product, or a giant personal knowledge system. It is just an easy way to manage your bookmarks in one place.
+## How it works
 
-## How It Works
+1. Export your bookmarks from your browser (an `.html` file), or create a new empty file.
+2. Open it in the app and organize it: changes are saved automatically.
+3. Import the file into any browser, whenever you want.
 
-The app uses the **Netscape Bookmark File Format**, which is still the most compatible format for importing bookmarks into browsers.
+Backups are kept in a `.zeromarks-backups` folder next to your file (the last 20, at most one every
+10 minutes, plus one whenever another program changed the file).
 
-That means:
+## What's different
 
-- no proprietary database
-- no required sync service
-- no special export format to learn
-- just one `.html` file
+Compared with the original JustBookmarks, ZeroMarks:
 
-It is not fancy, and it does not support tags, but it does support folders, nested organization, search, editing, moving, and import/merge workflows.
+- keeps tags, keywords, descriptions and other browser data that were lost when saving
+- saves safely (no corrupted file if the app stops mid-save) and keeps automatic backups
+- decodes special characters in titles (for example `&#39;` from Chrome)
+- detects duplicates library-wide when importing, and fills in missing details
+- adds find duplicates, dead-link check, folder sorting, recent files, external-change detection,
+  an About screen and the Italian translation
+- no longer asks Google for missing site icons (privacy)
+- fixes the test runner on Windows
 
-You only have to manage one bookmark file. You can sync it, back it up, or version it however you like, because at the end of the day it is just a normal file on disk.
+## Credits and license
 
-## Keyboard Help
+Based on [JustBookmarks](https://github.com/SellswordSoftware/justbookmarks) by **SellswordSoftware**,
+released under the MIT license. Thank you!
 
-The app includes a built-in shortcut and workflow reference.
+Released under the [MIT license](LICENSE).
+Copyright © 2026 SellswordSoftware · Copyright © 2026 TivuStream (modifications).
+Third-party components and their licenses are listed in [THIRD-PARTY-NOTICES.txt](THIRD-PARTY-NOTICES.txt).
 
-Press `?` or `F1` at any time to open it.
-
-![Keyboard shortcuts and help modal](docs/help.png)
-
-## What You Can Do
-
-- Open and manage a single bookmark HTML file
-- Browse bookmarks in a folder tree
-- Search bookmarks instantly
-- Add, edit, move, and delete bookmarks and folders
-- Refresh titles and favicons
-- Import and merge another bookmark file
-- Undo and redo changes
-- Work primarily from the keyboard if you want to stay off the mouse
-
-## Basic Workflow
-
-1. Open an existing Netscape bookmark file, or create a new one.
-2. Organize your folders and bookmarks.
-3. Save happens automatically as you work.
-4. Import that same file into whichever browser you are using today.
-
-That is the whole idea: one file, one source of truth, less browser lock-in.
+---
 
 ## Development
 
-This repo is a Tauri app with:
-
-- the frontend under `src/`
-- the Rust desktop host under `src-tauri/`
-- repo-root npm scripts for testing and launch
+This is a [Tauri](https://tauri.app) app: the frontend is plain JavaScript in `src/`, the desktop host is
+Rust in `src-tauri/`.
 
 ### Prerequisites
 
-Install:
-
 - Node.js and npm
-- Rust and Cargo
-- Tauri platform prerequisites for your OS
+- Rust and Cargo ([rustup.rs](https://rustup.rs))
+- Tauri prerequisites for your OS. On Windows: *Visual Studio C++ Build Tools* and WebView2 (included in
+  Windows 10/11). On Linux: WebKitGTK and related packages.
 
-On Linux, that usually includes WebKitGTK and related build dependencies required by Tauri.
-
-### Install Dependencies
-
-```bash
-npm install
-```
-
-### Run In Development
+### Common commands
 
 ```bash
-npm run tauri dev
+npm install            # install dependencies
+npm run tauri dev      # run the app in development mode
+npm test               # frontend tests
+npm run test:browser   # browser tests (downloads chrome-headless-shell when needed)
+cd src-tauri && cargo test   # backend tests
+npm run notices        # regenerate THIRD-PARTY-NOTICES.txt after dependency changes
+npm run tauri build    # build the installers (src-tauri/target/release/bundle/)
 ```
 
-Tauri uses the repo-root scripts in `package.json` to prepare the frontend entrypoint before launch.
+Coverage: `npm run test:coverage`, `npm run test:browser:coverage`, `npm run test:coverage:all`,
+`npm run test:coverage:html` (needs `genhtml` from `lcov`).
 
-## Testing
+### Translations
 
-Run the non-browser test suite:
+Interface texts are written in English and translated through `src/shared/i18n/`. The Italian texts are
+in `src/shared/i18n/it.js`: one line per text, `"English": "Italiano"`. Texts missing from the file are
+shown in English.
 
-```bash
-npm test
-```
+### Docs
 
-Run the browser test suite:
-
-```bash
-npm run test:browser
-```
-
-The browser runner auto-downloads `chrome-headless-shell` into a repo-local directory when needed and uses `--dump-dom` to execute and validate frontend tests.
-
-Generate Node coverage:
-
-```bash
-npm run test:coverage
-```
-
-This writes LCOV output to `coverage/lcov.info`.
-
-Generate browser coverage:
-
-```bash
-npm run test:browser:coverage
-```
-
-This writes LCOV output to `coverage/browser.lcov`.
-
-Generate both and merge them:
-
-```bash
-npm run test:coverage:all
-```
-
-This writes merged LCOV output to `coverage/all.lcov`.
-
-Generate a browsable HTML coverage report:
-
-```bash
-npm run test:coverage:html
-```
-
-This requires `genhtml` from the `lcov` package. When installed, it writes the HTML report to `coverage/html/`.
-
-Run the standard verification flow:
-
-```bash
-npm run verify
-```
-
-## Building
-
-Build a production desktop app:
-
-```bash
-npm run tauri build
-```
-
-## Frontend Docs
-
-For frontend work, start with:
-
-- `docs/agent-project-context.md`
-- `docs/frontend-architecture.md`
-- `docs/frontend-maintainability-guidelines.md`
-- `docs/naf-html-usage-guidelines.md`
-- `guide.md`
+- `docs/RENAMING.md`: checklist for changing the app name and identifier
+- `docs/agent-project-context.md`, `docs/frontend-architecture.md`,
+  `docs/frontend-maintainability-guidelines.md`, `docs/naf-html-usage-guidelines.md`, `guide.md`

@@ -6,7 +6,9 @@ import {
   OpenFilePicker,
 } from "../../shared/api/api.js";
 import {
+  clearRecentFiles,
   loadPersistedUIState,
+  removeRecentFile,
   setLastOpenedFile,
   setTheme,
   setWindowState,
@@ -174,6 +176,21 @@ export const appState = {
       return reloadPersistedState();
     },
     /**
+     * @param {string} path
+     * @returns {PersistedUIState}
+     */
+    removeRecentFile(path) {
+      const nextState = removeRecentFile(path);
+      persistedState(nextState);
+      return nextState;
+    },
+    /** @returns {PersistedUIState} */
+    clearRecentFiles() {
+      const nextState = clearRecentFiles();
+      persistedState(nextState);
+      return nextState;
+    },
+    /**
      * @param {"light" | "dark"} value
      */
     setTheme(value) {
@@ -240,6 +257,10 @@ export const appState = {
     /** @returns {string} */
     getCurrentFilePath() {
       return currentFilePath();
+    },
+    /** @returns {string[]} */
+    getRecentFiles() {
+      return persistedState().recentFiles ?? [];
     },
     /** @returns {boolean} */
     getHasTriedLoad() {

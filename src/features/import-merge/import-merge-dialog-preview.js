@@ -1,5 +1,7 @@
 // @ts-check
 
+import { t, tn } from "../../shared/i18n/i18n.js";
+
 /**
  * @typedef {"folders" | "bookmarks" | "duplicates" | "updates"} ImportMergePreviewSectionKey
  * @typedef {{
@@ -35,7 +37,7 @@ export function buildImportMergePreviewSections(preview) {
       emptyMessage: "No new folders will be created.",
       rows: preview.foldersToAdd.map((item) => ({
         primary: item.name,
-        secondary: item.path || "Root",
+        secondary: item.path || t("Root"),
       })),
     },
     {
@@ -73,7 +75,7 @@ export function buildImportMergePreviewSections(preview) {
       emptyMessage: "No existing matches were found.",
       rows: preview.potentialUpdates.map((item) => ({
         primary: item.url,
-        secondary: item.folderPath || "Root",
+        secondary: t("Already in {folder}", { folder: item.existingFolderPath || t("Root") }),
         before: item.existingTitle || item.url,
         after: item.incomingTitle || item.url,
       })),
@@ -215,7 +217,7 @@ function createEmptyState() {
     <div class="eyebrow import-merge-dialog__empty-eyebrow">Preview</div>
     <h3 class="import-merge-dialog__empty-title">Choose a bookmark file to compare</h3>
     <p class="import-merge-dialog__empty-copy">
-      The preview will show folders and bookmarks to add, duplicates to ignore, and possible title updates.
+      The preview will show folders and bookmarks to add, duplicates to ignore, and links already in your library.
     </p>
   `;
   return emptyState;
@@ -284,7 +286,7 @@ function createSectionPanel(section) {
   if (section.rows.length === 0) {
     const empty = document.createElement("p");
     empty.className = "import-merge-dialog__empty";
-    empty.textContent = section.emptyMessage;
+    empty.textContent = t(section.emptyMessage);
     rows.append(empty);
   } else {
     for (const row of section.rows) {
@@ -357,7 +359,7 @@ function createUpdateSide(label, value) {
 
   const labelEl = document.createElement("div");
   labelEl.className = "import-merge-dialog__update-label";
-  labelEl.textContent = label;
+  labelEl.textContent = t(label);
 
   const valueEl = document.createElement("div");
   valueEl.className = "import-merge-dialog__update-value";
@@ -373,14 +375,21 @@ function createUpdateSide(label, value) {
  */
 function describeSection(section) {
   if (section.key === "duplicates") {
-    return section.count === 1 ? "1 duplicate will be ignored" : `${section.count} duplicates will be ignored`;
+    return tn(section.count, "{count} duplicate will be ignored", "{count} duplicates will be ignored");
   }
 
   if (section.key === "updates") {
-    return section.count === 1 ? "1 existing match found and skipped" : `${section.count} existing matches found and skipped`;
+    return tn(
+      section.count,
+      "{count} link already in your library: kept, missing details filled in",
+      "{count} links already in your library: kept, missing details filled in",
+    );
   }
 
-  return section.count === 1 ? `1 ${section.shortLabel.toLowerCase().slice(0, -1)} to add` : `${section.count} ${section.shortLabel.toLowerCase()} to add`;
+  if (section.key === "folders") {
+    return tn(section.count, "{count} folder to add", "{count} folders to add");
+  }
+  return tn(section.count, "{count} bookmark to add", "{count} bookmarks to add");
 }
 
 /**
@@ -389,12 +398,12 @@ function describeSection(section) {
  */
 function describeSectionCompact(section) {
   if (section.key === "duplicates") {
-    return section.count === 1 ? "duplicate ignored" : "duplicates ignored";
+    return t(section.count === 1 ? "duplicate ignored" : "duplicates ignored");
   }
 
   if (section.key === "updates") {
-    return section.count === 1 ? "found, not applied" : "found, not applied";
+    return t("already saved");
   }
 
-  return section.count === 1 ? "to add" : "to add";
+  return t("to add");
 }

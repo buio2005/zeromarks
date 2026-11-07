@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "JustBookmarks",
-  "version": "0.3.0",
-  "identifier": "com.sellsword.JustBookmarks",
+  "productName": "ZeroMarks",
+  "version": "1.0.0",
+  "identifier": "it.tivustream.zeromarks",
   "build": {
     "beforeDevCommand": "npm run test:prepare:dev",
     "beforeBuildCommand": "npm run test:prepare:prod",
@@ -12,7 +12,7 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "JustBookmarks",
+        "title": "ZeroMarks",
         "width": 1200,
         "height": 800,
         "minWidth": 900,
@@ -27,7 +27,7 @@
       "csp": {
         "default-src": "'self' customprotocol: asset:",
         "base-uri": "'self'",
-        "connect-src": "ipc: http://ipc.localhost",
+        "connect-src": "'self' ipc: http://ipc.localhost",
         "form-action": "'self'",
         "frame-ancestors": "'none'",
         "img-src": "'self' asset: http://asset.localhost data: blob:",
@@ -47,6 +47,11 @@
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
-    ]
+    ],
+    "publisher": "TivuStream",
+    "copyright": "Copyright © 2026 SellswordSoftware, © 2026 TivuStream",
+    "category": "Productivity",
+    "shortDescription": "Private, local bookmark manager",
+    "longDescription": "ZeroMarks keeps all your bookmarks in one plain file on your computer, independent of any browser. Based on JustBookmarks by SellswordSoftware (MIT)."
   }
 }

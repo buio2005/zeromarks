@@ -1,5 +1,6 @@
 // @ts-check
 
+import { tn } from "../../../shared/i18n/i18n.js";
 import { cleanupCollector, effect, listener, list, raw, requireElement, template } from "../../../shared/runtime/naf.js";
 import { searchState } from "../../search/state/search-state.js";
 import { treeState } from "../state/tree-state.js";
@@ -190,14 +191,14 @@ export function mountBookmarkTree(root) {
     if (searchState.selectors.isSearching()) {
       const count = searchState.selectors.getResults().length;
       const query = searchState.selectors.getQuery();
-      treePaneMeta.textContent = `${count} result${count === 1 ? "" : "s"} for "${query}"`;
+      treePaneMeta.textContent = tn(count, '{count} result for "{query}"', '{count} results for "{query}"', { query });
       return;
     }
 
     const stats = treeState.selectors.getTreeStats();
     treePaneMeta.textContent =
-      `${stats.folders} folder${stats.folders === 1 ? "" : "s"}, ` +
-      `${stats.bookmarks} bookmark${stats.bookmarks === 1 ? "" : "s"}`;
+      `${tn(stats.folders, "{count} folder", "{count} folders")}, ` +
+      tn(stats.bookmarks, "{count} bookmark", "{count} bookmarks");
   });
 
   // Scroll restore: version-based handshake with restoreUIState().

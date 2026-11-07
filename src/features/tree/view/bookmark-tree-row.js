@@ -146,7 +146,7 @@ export function mountBookmarkTreeRow(el, entry, options) {
     if (toggle instanceof HTMLElement) {
       toggle.hidden = !folder;
       toggle.setAttribute("aria-hidden", folder ? "false" : "true");
-      toggle.textContent = expanded ? "⌄" : "›";
+      toggle.classList.toggle("is-expanded", expanded);
     }
 
     if (folderIcon instanceof HTMLElement) {

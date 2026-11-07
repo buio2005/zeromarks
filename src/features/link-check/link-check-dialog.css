@@ -1,0 +1,137 @@
+.link-check-dialog {
+  /* Opaque like the move dialog: the default modal surface is slightly translucent. */
+  background: var(--color-base-100);
+  display: flex;
+  flex-direction: column;
+  width: min(60rem, 100%);
+  max-height: calc(100vh - 2rem);
+  overflow: hidden;
+}
+
+.link-check-dialog__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  overflow: hidden;
+}
+
+.link-check-dialog__intro p + p {
+  margin-top: 0.5rem;
+}
+
+.link-check-dialog__intro,
+.link-check-dialog__group-hint,
+.link-check-dialog__row-url,
+.link-check-dialog__row-meta {
+  color: var(--color-muted);
+}
+
+.link-check-dialog__progress-bar {
+  width: 100%;
+  height: 0.5rem;
+  accent-color: var(--color-primary, currentColor);
+}
+
+.link-check-dialog__notice {
+  padding: 0.5rem 0.75rem;
+  border: var(--border) solid var(--color-border-soft);
+  border-radius: var(--radius-box);
+  background: var(--color-hover-card);
+  font-weight: 600;
+}
+
+/* Block flow on purpose: inside a grid/flex scroller the groups would collapse. */
+.link-check-dialog__list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  display: block;
+}
+
+.link-check-dialog__group {
+  border: var(--border) solid var(--color-border-soft);
+  border-radius: var(--radius-box);
+  overflow: hidden;
+}
+
+.link-check-dialog__group + .link-check-dialog__group {
+  margin-top: 0.75rem;
+}
+
+.link-check-dialog__group-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--color-hover-card);
+}
+
+.link-check-dialog__group-heading {
+  display: grid;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.link-check-dialog__group-title {
+  font-weight: 700;
+}
+
+.link-check-dialog__group-hint,
+.link-check-dialog__row-url,
+.link-check-dialog__row-meta {
+  font-size: var(--text-body-sm);
+}
+
+.link-check-dialog__row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-top: var(--border) solid var(--color-border-faint);
+}
+
+.link-check-dialog__row:hover {
+  background: var(--color-hover-card);
+}
+
+.link-check-dialog__row-main {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.link-check-dialog__checkbox {
+  flex: 0 0 auto;
+  width: 1rem;
+  height: 1rem;
+  cursor: pointer;
+}
+
+.link-check-dialog__row-text {
+  display: grid;
+  min-width: 0;
+}
+
+.link-check-dialog__row-title,
+.link-check-dialog__row-url,
+.link-check-dialog__row-meta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.link-check-dialog__row.is-removing .link-check-dialog__row-title {
+  text-decoration: line-through;
+  color: var(--color-muted);
+}
+
+.link-check-dialog__footer-left,
+.link-check-dialog__footer-right {
+  display: flex;
+  gap: 0.5rem;
+}

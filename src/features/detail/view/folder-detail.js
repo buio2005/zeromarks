@@ -1,6 +1,7 @@
 // @ts-check
 
-import { DeleteNode, UpdateFolderName } from "../../../shared/api/api.js";
+import { t, tn } from "../../../shared/i18n/i18n.js";
+import { DeleteNode, SortFolder, UpdateFolderName } from "../../../shared/api/api.js";
 import { createAddBookmarkForm } from "../../editing/add-bookmark-form.js";
 import { createAddFolderForm } from "../../editing/add-folder-form.js";
 import { getErrorMessage } from "../../../shared/infra/errors.js";
@@ -33,6 +34,7 @@ function hasRealDate(value) {
  */
 export function createFolderDetail(folder) {
   const editing = signal(false);
+  const sorting = signal(false);
   const busy = signal(false);
   const currentName = signal(folder.folder.name);
   const nameErrorMessage = signal("");
@@ -68,6 +70,13 @@ export function createFolderDetail(folder) {
         const header = /** @type {HTMLElement} */ (requireRef(ctx.refs, "header"));
         const editButton = requireRef(ctx.refs, "editButton");
         const moveButton = requireRef(ctx.refs, "moveButton");
+        const sortButton = requireRef(ctx.refs, "sortButton");
+        const sortPanel = /** @type {HTMLElement} */ (requireRef(ctx.refs, "sortPanel"));
+        const sortMode = /** @type {HTMLSelectElement} */ (requireRef(ctx.refs, "sortMode"));
+        const sortFoldersFirst = /** @type {HTMLInputElement} */ (requireRef(ctx.refs, "sortFoldersFirst"));
+        const sortRecursive = /** @type {HTMLInputElement} */ (requireRef(ctx.refs, "sortRecursive"));
+        const sortApplyButton = /** @type {HTMLButtonElement} */ (requireRef(ctx.refs, "sortApplyButton"));
+        const sortCancelButton = requireRef(ctx.refs, "sortCancelButton");
         const deleteButton = requireRef(ctx.refs, "deleteButton");
         const editPanel = /** @type {HTMLElement} */ (requireRef(ctx.refs, "editPanel"));
         const nameInput = /** @type {HTMLInputElement} */ (requireRef(ctx.refs, "nameInput"));
@@ -147,6 +156,53 @@ export function createFolderDetail(folder) {
           );
         }
 
+        /**
+         * @param {boolean} nextSorting
+         * @returns {void}
+         */
+        function setSorting(nextSorting) {
+          sorting(nextSorting);
+          if (nextSorting) {
+            setEditing(false);
+            queueMicrotask(() => sortMode.focus());
+          }
+        }
+
+        async function applySort() {
+          if (busy()) {
+            return;
+          }
+          busy(true);
+          try {
+            await SortFolder(folder.id, {
+              mode: /** @type {SortMode} */ (sortMode.value),
+              foldersFirst: sortFoldersFirst.checked,
+              recursive: sortRecursive.checked,
+            });
+            await treeState.actions.refresh();
+            treeState.actions.selectSingle(folder.id);
+            setSorting(false);
+            uiState.actions.showToast("Folder sorted. Press Ctrl+Z to undo.", "success");
+          } catch (caughtError) {
+            uiState.actions.showToast(getErrorMessage(caughtError, "Failed to sort folder"), "error");
+          } finally {
+            busy(false);
+          }
+        }
+
+        /** @param {KeyboardEvent} event */
+        function handleSortKeydown(event) {
+          if (event.key === "Escape") {
+            event.preventDefault();
+            event.stopPropagation();
+            setSorting(false);
+          } else if (event.key === "Enter" && !(event.target instanceof HTMLButtonElement)) {
+            event.preventDefault();
+            event.stopPropagation();
+            void applySort();
+          }
+        }
+
         function showMoveDialog() {
           moveDialogState.actions.showMoveDialog(
             folder.id,
@@ -157,6 +213,7 @@ export function createFolderDetail(folder) {
         }
 
         function handleEditClick() {
+          setSorting(false);
           setEditing(true);
         }
 
@@ -189,23 +246,35 @@ export function createFolderDetail(folder) {
         cleanup.add(
           listener(editButton, "click", handleEditClick),
           listener(moveButton, "click", showMoveDialog),
+          listener(sortButton, "click", () => setSorting(!sorting())),
+          listener(sortApplyButton, "click", () => void applySort()),
+          listener(sortCancelButton, "click", () => setSorting(false)),
+          listener(sortPanel, "keydown", handleSortKeydown),
+          show(sortPanel, sorting),
+          fx(sortApplyButton, (currentButton) => {
+            currentButton.disabled = busy();
+          }),
           listener(deleteButton, "click", showDeleteConfirm),
           listener(saveButton, "click", handleSaveClick),
           listener(cancelButton, "click", handleCancelClick),
           listener(nameInput, "keydown", handleNameKeydown),
           nameBinding.cleanup,
           fx(title, (currentTitleEl) => {
-            currentTitleEl.textContent = currentName() || "Untitled folder";
+            currentTitleEl.textContent = currentName() || t("Untitled folder");
           }),
           fx(count, (currentCountEl) => {
-            currentCountEl.textContent =
-              `${folder.folder.children.length} item${folder.folder.children.length === 1 ? "" : "s"}`;
+            // Children load lazily on expand; until then use the backend's count,
+            // the same rule the tree row uses.
+            const itemCount = folder.folder.childrenLoaded
+              ? folder.folder.children.length
+              : folder.folder.childCount;
+            currentCountEl.textContent = tn(itemCount, "{count} item", "{count} items");
           }),
           fx(created, (currentCreatedEl) => {
             const hasDate = hasRealDate(folder.folder.addDate);
             currentCreatedEl.hidden = !hasDate;
             currentCreatedEl.textContent = hasDate
-              ? `Created: ${new Date(folder.folder.addDate).toLocaleDateString()}`
+              ? t("Created: {date}", { date: new Date(folder.folder.addDate).toLocaleDateString() })
               : "";
           }),
           hide(header, editing),
@@ -216,7 +285,7 @@ export function createFolderDetail(folder) {
           fx(nameError, (currentNameError) => {
             const message = nameErrorMessage();
             currentNameError.hidden = message.length === 0;
-            currentNameError.textContent = message;
+            currentNameError.textContent = t(message);
           }),
         );
       },
@@ -251,6 +320,16 @@ export function createFolderDetail(folder) {
             <button
               type="button"
               class="btn btn-ghost btn-sm btn-square detail-action-btn detail-action-btn--main"
+              data-keyboard-action="folder-sort"
+              data-ref="sortButton"
+              aria-label="Sort folder contents"
+              title="Sort folder contents"
+            >
+              <span class="icon-mask detail-action-icon--sort" aria-hidden="true"></span>
+            </button>
+            <button
+              type="button"
+              class="btn btn-ghost btn-sm btn-square detail-action-btn detail-action-btn--main"
               data-keyboard-action="folder-move"
               data-ref="moveButton"
               aria-label="Move folder"
@@ -269,6 +348,33 @@ export function createFolderDetail(folder) {
               <span class="icon-mask detail-action-icon--delete" aria-hidden="true"></span>
             </button>
           </div>
+        </div>
+      </div>
+
+      <div class="panel folder-detail__sort" hidden data-ref="sortPanel">
+        <div class="field">
+          <label class="eyebrow label" for="folder-sort-mode-${folder.id}">Sort contents by</label>
+          <select id="folder-sort-mode-${folder.id}" class="select" data-ref="sortMode">
+            <option value="nameAsc">Name (A → Z)</option>
+            <option value="nameDesc">Name (Z → A)</option>
+            <option value="dateNewest">Date added (newest first)</option>
+            <option value="dateOldest">Date added (oldest first)</option>
+            <option value="domain">Website</option>
+          </select>
+        </div>
+        <div class="folder-detail__sort-options">
+          <label class="folder-detail__sort-option">
+            <input type="checkbox" checked data-ref="sortFoldersFirst" />
+            Folders first
+          </label>
+          <label class="folder-detail__sort-option">
+            <input type="checkbox" data-ref="sortRecursive" />
+            Include subfolders
+          </label>
+        </div>
+        <div class="detail-inline-actions">
+          <button type="button" class="btn btn-primary btn-sm" data-ref="sortApplyButton">Sort</button>
+          <button type="button" class="btn btn-ghost btn-sm" data-ref="sortCancelButton">Cancel</button>
         </div>
       </div>
 

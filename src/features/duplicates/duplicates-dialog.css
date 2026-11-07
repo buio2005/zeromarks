@@ -1,0 +1,112 @@
+.duplicates-dialog {
+  /* Opaque like the move dialog: the default modal surface is slightly translucent. */
+  background: var(--color-base-100);
+  display: flex;
+  flex-direction: column;
+  width: min(56rem, 100%);
+  max-height: calc(100vh - 2rem);
+  overflow: hidden;
+}
+
+.duplicates-dialog__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+}
+
+/* Plain block flow on purpose: in a grid/flex scroller the groups (overflow: hidden)
+   get a zero minimum height and collapse into thin bars instead of scrolling. */
+.duplicates-dialog__list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  display: block;
+}
+
+.duplicates-dialog__group + .duplicates-dialog__group {
+  margin-top: 0.75rem;
+}
+
+.duplicates-dialog__group {
+  border: var(--border) solid var(--color-border-soft);
+  border-radius: var(--radius-box);
+  overflow: hidden;
+}
+
+.duplicates-dialog__group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--color-hover-card);
+}
+
+.duplicates-dialog__group-url {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--text-body-sm);
+  font-weight: 600;
+}
+
+.duplicates-dialog__row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-top: var(--border) solid var(--color-border-faint);
+  cursor: pointer;
+}
+
+.duplicates-dialog__row:hover {
+  background: var(--color-hover-card);
+}
+
+.duplicates-dialog__checkbox {
+  flex: 0 0 auto;
+  width: 1rem;
+  height: 1rem;
+  cursor: pointer;
+}
+
+.duplicates-dialog__row-text {
+  display: grid;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.duplicates-dialog__row-title,
+.duplicates-dialog__row-meta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.duplicates-dialog__row-meta,
+.duplicates-dialog__row-status {
+  font-size: var(--text-body-sm);
+  color: var(--color-muted);
+}
+
+.duplicates-dialog__row-status {
+  flex: 0 0 auto;
+  font-weight: 600;
+}
+
+.duplicates-dialog__row.is-removing .duplicates-dialog__row-title {
+  text-decoration: line-through;
+  color: var(--color-muted);
+}
+
+.duplicates-dialog__row.is-removing .duplicates-dialog__row-status {
+  color: var(--color-error, currentColor);
+}
+
+.duplicates-dialog__footer-left,
+.duplicates-dialog__footer-right {
+  display: flex;
+  gap: 0.5rem;
+}

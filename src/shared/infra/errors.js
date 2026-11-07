@@ -1,5 +1,7 @@
 // @ts-check
 
+import { t } from "../i18n/i18n.js";
+
 /**
  * Normalize unknown errors into a user-facing string.
  *
@@ -9,12 +11,12 @@
  */
 export function getErrorMessage(error, fallback = "Unexpected error") {
   if (error instanceof Error && error.message) {
-    return error.message;
+    return t(error.message);
   }
 
   if (typeof error === "string" && error.length > 0) {
-    return error;
+    return t(error);
   }
 
-  return fallback;
+  return t(fallback);
 }

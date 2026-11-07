@@ -1,5 +1,6 @@
 // @ts-check
 
+import { getLanguage, setLanguage, t } from "../../shared/i18n/i18n.js";
 import { attr, effect, listener, mount, requireElement, requireRef, template } from "../../shared/runtime/naf.js";
 import {
   closeApplication,
@@ -8,6 +9,8 @@ import {
   toggleMaximiseWindow as hostToggleMaximiseWindow,
 } from "../../shared/runtime/window-host.js";
 import { appState } from "../../shared/state/app-state.js";
+import { APP_INFO } from "../../shared/app-info.js";
+import { aboutDialog } from "../../features/about/about-dialog.js";
 import { saving } from "../../shared/state/save-state.js";
 
 /** @returns {void} */
@@ -65,7 +68,7 @@ function createTitlebarBrandComponent() {
   return renderBrand /*html*/ `
     <div class="titlebar__brand">
       <div class="titlebar__title-row">
-        <h1 class="titlebar__title">JustBookmarks</h1>
+        <h1 class="titlebar__title">${APP_INFO.name}</h1>
         <span
           class="spinner spinner-sm titlebar__save-spinner"
           hidden
@@ -86,6 +89,13 @@ function createTitlebarWindowControlsComponent() {
       onMount(_el, _host, ctx) {
         const { refs, cleanup } = ctx;
         const themeToggleButton = /** @type {HTMLButtonElement} */ (requireRef(refs, "themeToggleButton"));
+        const languageButton = /** @type {HTMLButtonElement} */ (requireRef(refs, "languageButton"));
+        const aboutButton = /** @type {HTMLButtonElement} */ (requireRef(refs, "aboutButton"));
+        aboutButton.addEventListener("click", () => aboutDialog.open());
+        languageButton.textContent = getLanguage() === "it" ? "IT" : "EN";
+        languageButton.addEventListener("click", () => {
+          setLanguage(getLanguage() === "it" ? "en" : "it");
+        });
         const minimizeButton = /** @type {HTMLButtonElement} */ (requireRef(refs, "minimizeButton"));
         const maximizeButton = /** @type {HTMLButtonElement} */ (requireRef(refs, "maximizeButton"));
         const closeButton = /** @type {HTMLButtonElement} */ (requireRef(refs, "closeButton"));
@@ -118,9 +128,9 @@ function createTitlebarWindowControlsComponent() {
             maximizeButton.textContent = maximised ? "❐" : "□";
             maximizeButton.setAttribute(
               "aria-label",
-              maximised ? "Restore window" : "Maximize window",
+              t(maximised ? "Restore window" : "Maximize window"),
             );
-            maximizeButton.title = maximised ? "Restore" : "Maximize";
+            maximizeButton.title = t(maximised ? "Restore" : "Maximize");
           }),
         );
 
@@ -131,6 +141,26 @@ function createTitlebarWindowControlsComponent() {
 
   return renderControls/*html*/`
     <div class="titlebar__window-controls" data-no-window-drag data-ref="windowControls">
+      <button
+        id="about-button"
+        type="button"
+        data-ref="aboutButton"
+        class="btn btn-ghost btn-sm btn-square"
+        title="About and privacy"
+        aria-label="About and privacy"
+      >
+        &#9432;
+      </button>
+      <button
+        id="language-toggle"
+        type="button"
+        data-ref="languageButton"
+        class="btn btn-ghost btn-sm titlebar__language"
+        title="Switch language: English / Italiano"
+        aria-label="Switch language: English / Italiano"
+      >
+        EN
+      </button>
       <button
         id="theme-toggle"
         data-ref="themeToggleButton"

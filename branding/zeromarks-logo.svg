@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1254 1254" width="1254" height="1254">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="42%" r="60%">
+      <stop offset="0" stop-color="#0f2240"/>
+      <stop offset="0.7" stop-color="#060d1a"/>
+      <stop offset="1" stop-color="#03060c"/>
+    </radialGradient>
+    <linearGradient id="sym" x1="0" y1="0" x2="0.35" y2="1">
+      <stop offset="0" stop-color="#7fdcff"/>
+      <stop offset="0.45" stop-color="#1f9bff"/>
+      <stop offset="1" stop-color="#0a48c0"/>
+    </linearGradient>
+    <linearGradient id="cyan" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b8f6ff"/>
+      <stop offset="0.5" stop-color="#22d8ff"/>
+      <stop offset="1" stop-color="#0592c8"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <pattern id="hex" width="56" height="97" patternUnits="userSpaceOnUse" patternTransform="scale(0.6)">
+      <path d="M28 0 L56 16 L56 48 L28 64 L0 48 L0 16 Z M28 64 L28 97" fill="none" stroke="#1a3a66" stroke-width="2" opacity="0.35"/>
+    </pattern>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="14" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="softglow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="9" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <rect width="1254" height="1254" fill="#04070d"/>
+  <g transform="translate(287 120) scale(0.66)">
+  <circle cx="512" cy="512" r="470" fill="url(#bg)"/>
+  <circle cx="512" cy="512" r="470" fill="url(#hex)"/>
+  <circle cx="512" cy="512" r="452" fill="none" stroke="#0b3566" stroke-width="10"/>
+  <circle cx="512" cy="512" r="474" fill="none" stroke="#2aa8ff" stroke-width="16" filter="url(#glow)"/>
+  <circle cx="512" cy="512" r="474" fill="none" stroke="#bfeaff" stroke-width="4"/>
+<g transform="translate(512 520) scale(1.22) translate(-512 -514)">
+  <g filter="url(#shadow)">
+    <path d="M352 250 Q352 216 386 216 H638 Q672 216 672 250 V812 L512 690 L352 812 Z" fill="url(#sym)"/>
+    <path d="M352 250 Q352 216 386 216 H638 Q672 216 672 250 V812 L512 690 L352 812 Z" fill="none" stroke="#a8e8ff" stroke-width="6"/>
+    <path d="M362 252 Q362 228 386 228 H638 Q660 228 660 252 V420 H362 Z" fill="url(#shine)" opacity="0.7"/>
+    <polygon points="412,318 612,318 612,376 505,542 612,542 612,600 412,600 412,542 519,376 412,376" fill="#06122a"/>
+    <polygon points="412,318 612,318 612,376 505,542 612,542 612,600 412,600 412,542 519,376 412,376" fill="none" stroke="#4fc3ff" stroke-width="3" opacity="0.6"/>
+  </g>
+</g></g>
+  <text x="627" y="1010" text-anchor="middle" font-family="Segoe UI Black, Arial Black, sans-serif" font-weight="900" font-style="italic" font-size="150" letter-spacing="6">
+    <tspan fill="#f2f6fa">ZERO</tspan><tspan fill="#1fd6ff">MARKS</tspan>
+  </text>
+</svg>

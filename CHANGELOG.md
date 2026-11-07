@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0] ZeroMarks (TivuStream) – first release
+
+Renamed to **ZeroMarks** (identifier `it.tivustream.zeromarks`). Based on JustBookmarks 0.3.x by SellswordSoftware.
+
+### Fixed
+
+- Browser data (tags, keywords, descriptions, toolbar folder) is no longer lost when saving
+- Safe saving (no truncated file on crash) and automatic backups in `.zeromarks-backups`
+- Special characters in titles (e.g. `&#39;`) are decoded
+- Import recognizes duplicates across the whole library and fills in missing details
+- Folder details show the right item count before the folder is expanded
+- Light theme: text that inherits its color is no longer near-white
+- Test runner works on Windows
+
+### Added
+
+- Find duplicates, dead-link check, folder sorting, recent files
+- Detection of changes made to the file by other programs
+- Italian interface (IT / EN switch), About screen with privacy note and credits
+- THIRD-PARTY-NOTICES.txt (`npm run notices`)
+
+### Changed
+
+- Missing site icons are no longer requested from Google (privacy)
+
 ## [0.3.1-4]
 
 ### Changed

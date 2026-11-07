@@ -1,5 +1,7 @@
 // @ts-check
 
+import { translateStaticDom } from "../i18n/i18n.js";
+
 /**
  * Hybrid local runtime for the app frontend.
  *
@@ -668,6 +670,7 @@ export function model(el, sig, options) {
 function createTemplateFromString(html) {
   const template = document.createElement("template");
   template.innerHTML = html;
+  translateStaticDom(template.content);
   return template;
 }
 
@@ -1179,6 +1182,7 @@ export function collectRowRefs(el) {
  */
 function createFragment(html) {
   tempDiv.innerHTML = html;
+  translateStaticDom(tempDiv);
   const fragment = document.createDocumentFragment();
   while (tempDiv.firstChild) {
     fragment.appendChild(tempDiv.firstChild);

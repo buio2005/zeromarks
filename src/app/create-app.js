@@ -1,4 +1,5 @@
 import { requireElement } from "../shared/runtime/naf.js";
+import { getLanguage, translateStaticDom } from "../shared/i18n/i18n.js";
 import { mountAppLifecycle } from "./lifecycle.js";
 import { bootstrapSession } from "./session.js";
 import { mountConfirmModal } from "../components/confirm-modal/confirm-modal.js";
@@ -10,6 +11,10 @@ import {
 import {
   mountImportMergeDialog,
 } from "../features/import-merge/import-merge-dialog.js";
+import { mountDuplicatesDialog } from "../features/duplicates/duplicates-dialog.js";
+import { mountLinkCheckDialog } from "../features/link-check/link-check-dialog.js";
+import { mountExternalChangeWatcher } from "../features/external-change/external-change.js";
+import { mountAboutDialog } from "../features/about/about-dialog.js";
 import { mountToastContainer } from "../components/toast/toast-container.js";
 import { mountTitlebar } from "../components/titlebar/titlebar.js";
 import { mountPageHost } from "./page-host.js";
@@ -79,6 +84,9 @@ function collectShell(root) {
  * @returns {AppShell}
  */
 export function createApp(root) {
+  document.documentElement.lang = getLanguage();
+  // Fixed texts written directly in index.html.
+  translateStaticDom(root);
   const cleanupTitlebar = mountTitlebar(root);
   const shell = collectShell(root);
   const cleanupLayout = mountLayout(root);
@@ -86,6 +94,10 @@ export function createApp(root) {
   const confirmModal = mountConfirmModal(root);
   const importMergeDialog = mountImportMergeDialog(root);
   const moveDialog = mountMoveDialog(root);
+  const duplicatesDialog = mountDuplicatesDialog(root);
+  const linkCheckDialog = mountLinkCheckDialog(root);
+  const externalChange = mountExternalChangeWatcher(root);
+  const aboutDialog = mountAboutDialog(root);
   const shortcutsDialog = mountKeyboardShortcutsDialog(root);
   const pageHost = mountPageHost(shell);
   const lifecycle = mountAppLifecycle({
@@ -96,6 +108,10 @@ export function createApp(root) {
       confirmModal,
       importMergeDialog,
       moveDialog,
+      duplicatesDialog,
+      linkCheckDialog,
+      externalChange,
+      aboutDialog,
       shortcutsDialog,
       pageHost,
     ],

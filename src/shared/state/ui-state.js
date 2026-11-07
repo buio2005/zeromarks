@@ -1,5 +1,6 @@
 // @ts-check
 
+import { t } from "../i18n/i18n.js";
 import { signal } from "../../shared/runtime/naf.js";
 
 /**
@@ -67,7 +68,7 @@ export const uiState = {
      */
     showToast(message, type = "info", duration = 4000) {
       const id = Date.now() + Math.random();
-      const nextToast = { id, message, type };
+      const nextToast = { id, message: t(message), type };
       toasts([...toasts(), nextToast]);
 
       const timer = setTimeout(() => {
@@ -108,9 +109,9 @@ export const uiState = {
     ) {
       const nextModal = {
         open: true,
-        title,
-        message,
-        confirmLabel,
+        title: t(title),
+        message: t(message),
+        confirmLabel: t(confirmLabel),
         onConfirm,
       };
       modal(nextModal);

@@ -1,5 +1,6 @@
 // @ts-check
 
+import { t } from "../../../shared/i18n/i18n.js";
 import {
   DeleteNodes,
   FetchFaviconsForNodes,
@@ -160,10 +161,10 @@ export function createBulkSelectionDetail() {
           listener(clearButton, "click", clearSelection),
           fx(title, (currentTitle) => {
             const selectionCount = treeState.computed.selectionCount();
-            currentTitle.textContent = `${selectionCount} ${getSelectionLabel()}`;
+            currentTitle.textContent = `${selectionCount} ${t(getSelectionLabel())}`;
           }),
           fx(subtitle, (currentSubtitle) => {
-            currentSubtitle.textContent = `Sibling group: ${getParentLabel()}`;
+            currentSubtitle.textContent = t("Sibling group: {group}", { group: t(getParentLabel()) });
           }),
           fx(clearButton, (currentClearButton) => {
             currentClearButton.disabled = runningAction() !== "";
@@ -174,14 +175,14 @@ export function createBulkSelectionDetail() {
           fx(deleteButton, (currentDeleteButton) => {
             const activeAction = runningAction();
             currentDeleteButton.disabled = activeAction !== "";
-            currentDeleteButton.textContent = activeAction === "delete" ? "Deleting..." : "Delete";
+            currentDeleteButton.textContent = t(activeAction === "delete" ? "Deleting..." : "Delete");
           }),
           fx(faviconButton, (currentFaviconButton) => {
             const activeAction = runningAction();
             currentFaviconButton.hidden = isFolderSelection();
             currentFaviconButton.disabled = activeAction !== "";
             currentFaviconButton.textContent =
-              activeAction === "favicons" ? "Fetching..." : "Fetch Favicons";
+              t(activeAction === "favicons" ? "Fetching..." : "Fetch Favicons");
           }),
         );
       },

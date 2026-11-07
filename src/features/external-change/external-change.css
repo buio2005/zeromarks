@@ -1,0 +1,55 @@
+#external-change-container {
+  position: fixed;
+  top: 0.75rem;
+  left: 50%;
+  z-index: 60;
+  width: min(48rem, calc(100vw - 2rem));
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.external-change {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border: var(--border) solid var(--color-border-soft);
+  border-radius: var(--radius-box);
+  background: var(--color-surface-1);
+  box-shadow: var(--shadow-md);
+  pointer-events: auto;
+}
+
+.external-change[hidden] {
+  display: none;
+}
+
+.external-change__icon {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background: var(--color-warning, #e0a100);
+  color: #000;
+  font-weight: 800;
+}
+
+.external-change__text {
+  display: grid;
+  flex: 1 1 auto;
+  min-width: 0;
+  gap: 0.125rem;
+}
+
+.external-change__message {
+  font-size: var(--text-body-sm);
+  color: var(--color-muted);
+}
+
+.external-change__actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 0.5rem;
+}

@@ -9,6 +9,9 @@ import {
   template,
 } from "../../shared/runtime/naf.js";
 import { appState } from "../../shared/state/app-state.js";
+import { duplicatesState } from "../../features/duplicates/duplicates-state.js";
+import { linkCheckState } from "../../features/link-check/link-check-state.js";
+import { bindRecentFilesMenu } from "../../features/recent-files/recent-files.js";
 import { createAddBookmarkForm } from "../../features/editing/add-bookmark-form.js";
 import { createAddFolderForm } from "../../features/editing/add-folder-form.js";
 
@@ -36,6 +39,10 @@ function createToolbarActionsComponent(actions) {
           const openButton = /** @type {HTMLButtonElement} */ (requireRef(ctx.refs, "openButton"));
           const createButton = /** @type {HTMLButtonElement} */ (requireRef(ctx.refs, "createButton"));
           const importButton = /** @type {HTMLButtonElement} */ (requireRef(ctx.refs, "importButton"));
+          const duplicatesButton = /** @type {HTMLButtonElement} */ (requireRef(ctx.refs, "duplicatesButton"));
+          const linkCheckButton = /** @type {HTMLButtonElement} */ (requireRef(ctx.refs, "linkCheckButton"));
+          const recentButton = /** @type {HTMLButtonElement} */ (requireRef(ctx.refs, "recentButton"));
+          const recentMenu = /** @type {HTMLElement} */ (requireRef(ctx.refs, "recentMenu"));
 
           const handleOpenClick = () => {
             void actions.openFile();
@@ -52,6 +59,11 @@ function createToolbarActionsComponent(actions) {
             listener(createButton, "click", handleCreateClick),
             listener(importButton, "click", handleImportClick),
             attr(importButton, "disabled", () => !appState.selectors.getCurrentFilePath()),
+            listener(duplicatesButton, "click", () => void duplicatesState.actions.openDuplicates()),
+            attr(duplicatesButton, "disabled", () => !appState.selectors.getCurrentFilePath()),
+            listener(linkCheckButton, "click", () => linkCheckState.actions.openLinkCheck()),
+            bindRecentFilesMenu(recentButton, recentMenu),
+            attr(linkCheckButton, "disabled", () => !appState.selectors.getCurrentFilePath()),
           );
         },
         onUnmount() {
@@ -72,6 +84,21 @@ function createToolbarActionsComponent(actions) {
       >
         <span class="icon-mask toolbar-action-icon toolbar-action-icon--open" aria-hidden="true"></span>
       </button>
+      <div class="recent-files">
+        <button
+          type="button"
+          class="btn btn-ghost btn-sm btn-square toolbar-action-btn"
+          data-toolbar-action="recent"
+          data-ref="recentButton"
+          aria-label="Recent files (Ctrl+Shift+O)"
+          title="Recent files (Ctrl+Shift+O)"
+          aria-haspopup="menu"
+          aria-expanded="false"
+        >
+          <span class="icon-mask toolbar-action-icon toolbar-action-icon--recent" aria-hidden="true"></span>
+        </button>
+        <div class="recent-files__menu" role="menu" data-ref="recentMenu" hidden></div>
+      </div>
       <button
         type="button"
         class="btn btn-ghost btn-sm btn-square toolbar-action-btn"
@@ -91,6 +118,26 @@ function createToolbarActionsComponent(actions) {
         title="Import another bookmark file into the current library"
       >
         <span class="icon-mask toolbar-action-icon toolbar-action-icon--import" aria-hidden="true"></span>
+      </button>
+      <button
+        type="button"
+        class="btn btn-ghost btn-sm btn-square toolbar-action-btn"
+        data-toolbar-action="duplicates"
+        data-ref="duplicatesButton"
+        aria-label="Find duplicate bookmarks (Ctrl+Shift+D)"
+        title="Find duplicate bookmarks (Ctrl+Shift+D)"
+      >
+        <span class="icon-mask toolbar-action-icon toolbar-action-icon--duplicates" aria-hidden="true"></span>
+      </button>
+      <button
+        type="button"
+        class="btn btn-ghost btn-sm btn-square toolbar-action-btn"
+        data-toolbar-action="link-check"
+        data-ref="linkCheckButton"
+        aria-label="Check for dead links (Ctrl+Shift+L)"
+        title="Check for dead links (Ctrl+Shift+L)"
+      >
+        <span class="icon-mask toolbar-action-icon toolbar-action-icon--link-check" aria-hidden="true"></span>
       </button>
     </div>
   `;

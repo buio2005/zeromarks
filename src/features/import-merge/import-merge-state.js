@@ -1,5 +1,6 @@
 // @ts-check
 
+import { t } from "../../shared/i18n/i18n.js";
 import { ApplyImportMerge, OpenImportFilePicker, PreviewImportMerge } from "../../shared/api/api.js";
 import { getErrorMessage } from "../../shared/infra/errors.js";
 import { signal } from "../../shared/runtime/naf.js";
@@ -116,7 +117,13 @@ export const importMergeState = {
         await treeState.actions.refresh();
         importMergeState.actions.closeImportMergeDialog(true);
         uiState.actions.showToast(
-          `Merge applied: ${result.foldersAdded} folders, ${result.bookmarksAdded} bookmarks`,
+          t("Merge applied: {folders} folders, {bookmarks} bookmarks", {
+            folders: result.foldersAdded,
+            bookmarks: result.bookmarksAdded,
+          }) +
+            (result.bookmarksUpdated > 0
+              ? t(", {count} completed with missing details", { count: result.bookmarksUpdated })
+              : ""),
           "success",
         );
       } catch (caughtError) {

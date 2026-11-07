@@ -55,6 +55,28 @@ export async function openFile(shell) {
 }
 
 /**
+ * Opens a file from the recent list. A file that can no longer be opened
+ * (moved, renamed, deleted) is dropped from the list.
+ *
+ * @param {string} path
+ * @returns {Promise<boolean>}
+ */
+export async function openRecentFile(path) {
+  if (!path || path === appState.selectors.getCurrentFilePath()) {
+    return true;
+  }
+  const loaded = await loadFileIntoSession(path, true);
+  appState.actions.setHasTriedLoad(true);
+  if (!loaded) {
+    appState.actions.removeRecentFile(path);
+    uiState.actions.showToast("That file could not be opened and was removed from the recent list", "error");
+    return false;
+  }
+  document.getElementById("search-input")?.focus();
+  return true;
+}
+
+/**
  * @param {AppSessionShell} shell
  * @returns {Promise<void>}
  */

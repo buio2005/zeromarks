@@ -1,6 +1,8 @@
 mod bookmarks;
 mod commands;
 mod dto;
+mod link_check;
+mod sorting;
 mod models;
 mod state;
 
@@ -22,6 +24,11 @@ pub fn run() {
             commands::get_flat_index,
             commands::get_all_folders,
             commands::get_tree_stats,
+            commands::find_duplicates,
+            commands::check_links,
+            commands::sort_folder,
+            commands::check_external_change,
+            commands::keep_local_version,
             commands::add_bookmark,
             commands::add_folder,
             commands::update_bookmark,

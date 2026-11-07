@@ -12,7 +12,7 @@
 import { collectTests, runTests } from "./lib/test.js";
 import { resolve, dirname } from "node:path";
 import { readdirSync, statSync } from "node:fs";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { installStrictImportDOM } from "./lib/node-dom-shim.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -51,7 +51,7 @@ if (testFiles.length === 0) {
 
 // Import all test files (registers tests via describe/test)
 for (const file of testFiles) {
-  await import(file);
+  await import(pathToFileURL(file).href);
 }
 
 // Collect and run

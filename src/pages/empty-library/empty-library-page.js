@@ -1,5 +1,6 @@
 // @ts-check
 
+import { t } from "../../shared/i18n/i18n.js";
 import { searchState } from "../../features/search/state/search-state.js";
 import { treeState } from "../../features/tree/state/tree-state.js";
 import {
@@ -11,6 +12,7 @@ import {
   requireRef,
   template,
 } from "../../shared/runtime/naf.js";
+import { bindRecentFilesList } from "../../features/recent-files/recent-files.js";
 import {
   showEmptyLibraryFrame,
   showLibraryFrame,
@@ -45,6 +47,7 @@ function createEmptyLibrarySplash(actions) {
         onMount(_el, _parent, ctx) {
           const openButton = /** @type {HTMLButtonElement} */ (requireRef(ctx.refs, "openButton"));
           const createButton = /** @type {HTMLButtonElement} */ (requireRef(ctx.refs, "createButton"));
+          const recentList = /** @type {HTMLElement} */ (requireRef(ctx.refs, "recentList"));
 
           const handleOpenClick = () => {
             void actions.openFile();
@@ -58,6 +61,7 @@ function createEmptyLibrarySplash(actions) {
             listener(createButton, "click", handleCreateClick),
             attr(openButton, "disabled", () => treeState.selectors.isLoading()),
             attr(createButton, "disabled", () => treeState.selectors.isLoading()),
+            bindRecentFilesList(recentList),
           );
 
           queueMicrotask(() => {
@@ -78,7 +82,7 @@ function createEmptyLibrarySplash(actions) {
         Open your archive or start a fresh one.
       </h2>
       <p class="empty-library-page__copy">
-        JustBookmarks keeps everything in a plain bookmarks HTML file, so your
+        Everything is kept in a plain bookmarks HTML file, so your
         library stays portable, inspectable, and yours.
       </p>
       <div class="empty-library-page__actions">
@@ -97,6 +101,7 @@ function createEmptyLibrarySplash(actions) {
           Create File
         </button>
       </div>
+      <div class="recent-files__list" data-ref="recentList" hidden></div>
     </section>
   `;
 }
@@ -129,11 +134,9 @@ export function mountEmptyLibraryPage(shell, actions) {
     const treeError = treeState.selectors.getError();
     const loading = treeState.selectors.isLoading();
 
-    titlebarMeta.textContent = treeError
-      ? treeError
-      : loading
-        ? "Loading bookmark library..."
-        : "No bookmark file is open";
+    titlebarMeta.textContent = t(
+      treeError || (loading ? "Loading bookmark library..." : "No bookmark file is open"),
+    );
   });
 
   return {

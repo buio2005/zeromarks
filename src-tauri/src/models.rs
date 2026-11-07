@@ -64,6 +64,13 @@ pub struct Bookmark {
     pub add_date: String,
     pub last_modified: String,
     pub meta: String,
+    /// Text of the `<DD>` line that follows the entry (browser "description").
+    #[serde(default)]
+    pub description: String,
+    /// Attributes this app does not interpret (TAGS, SHORTCUTURL,
+    /// PERSONAL_TOOLBAR_FOLDER, ...), kept in file order so saving never drops them.
+    #[serde(default)]
+    pub extra_attrs: Vec<(String, String)>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq)]
@@ -86,6 +93,13 @@ pub struct Folder {
     pub add_date: String,
     pub last_modified: String,
     pub meta: String,
+    /// Text of the `<DD>` line that follows the entry (browser "description").
+    #[serde(default)]
+    pub description: String,
+    /// Attributes this app does not interpret (TAGS, SHORTCUTURL,
+    /// PERSONAL_TOOLBAR_FOLDER, ...), kept in file order so saving never drops them.
+    #[serde(default)]
+    pub extra_attrs: Vec<(String, String)>,
     pub children: Vec<Node>,
 }
 

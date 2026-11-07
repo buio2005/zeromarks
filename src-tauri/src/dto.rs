@@ -84,6 +84,8 @@ pub struct BookmarkMergeItem {
 #[serde(rename_all = "camelCase")]
 pub struct BookmarkConflictItem {
     pub folder_path: String,
+    /// Where the matching bookmark already lives (may differ from `folder_path`).
+    pub existing_folder_path: String,
     pub existing_title: String,
     pub incoming_title: String,
     pub url: String,
@@ -100,6 +102,25 @@ pub struct MergePreview {
     pub potential_updates: Vec<BookmarkConflictItem>,
 }
 
+/// One copy of a link that appears more than once in the library.
+#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct DuplicateItem {
+    pub id: String,
+    pub title: String,
+    pub url: String,
+    pub folder_path: String,
+    pub add_date: String,
+}
+
+/// All copies of the same link, in library order (top to bottom).
+#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct DuplicateGroup {
+    pub url: String,
+    pub items: Vec<DuplicateItem>,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct MergeApplyResult {
@@ -107,6 +128,8 @@ pub struct MergeApplyResult {
     pub bookmarks_added: i32,
     pub duplicates_skipped: i32,
     pub potential_updates: i32,
+    /// Existing matches that gained missing details (icon, description, tags...).
+    pub bookmarks_updated: i32,
 }
 
 impl From<BookmarkCreateDto> for Bookmark {

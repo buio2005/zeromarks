@@ -72,6 +72,29 @@
   -webkit-mask-image: var(--mask-edit);
 }
 
+.detail-action-icon--sort::before {
+  mask-image: var(--mask-sort);
+  -webkit-mask-image: var(--mask-sort);
+}
+
+.folder-detail__sort {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.folder-detail__sort-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+}
+
+.folder-detail__sort-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
 .detail-action-icon--move::before {
   mask-image: var(--mask-move);
   -webkit-mask-image: var(--mask-move);

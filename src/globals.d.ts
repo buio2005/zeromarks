@@ -171,6 +171,7 @@ declare global {
 
   interface BookmarkConflictItem {
     folderPath: string;
+    existingFolderPath: string;
     existingTitle: string;
     incomingTitle: string;
     url: string;
@@ -185,11 +186,44 @@ declare global {
     potentialUpdates: BookmarkConflictItem[];
   }
 
+  interface DuplicateItem {
+    id: string;
+    title: string;
+    url: string;
+    folderPath: string;
+    addDate: string;
+  }
+
+  type SortMode = "nameAsc" | "nameDesc" | "dateNewest" | "dateOldest" | "domain";
+
+  interface SortOptions {
+    mode: SortMode;
+    foldersFirst: boolean;
+    recursive: boolean;
+  }
+
+  type LinkCheckStatus = "ok" | "redirected" | "broken" | "uncertain" | "skipped";
+
+  interface LinkCheckResult {
+    id: string;
+    url: string;
+    status: LinkCheckStatus;
+    httpStatus: number;
+    finalUrl: string;
+    message: string;
+  }
+
+  interface DuplicateGroup {
+    url: string;
+    items: DuplicateItem[];
+  }
+
   interface MergeApplyResult {
     foldersAdded: number;
     bookmarksAdded: number;
     duplicatesSkipped: number;
     potentialUpdates: number;
+    bookmarksUpdated: number;
   }
 
   interface HistoryState {
@@ -267,6 +301,8 @@ declare global {
     window: WindowState | null;
     files: Record<string, PerFileTreeState>;
     theme: "light" | "dark";
+    /** Most recently opened bookmark files, newest first. */
+    recentFiles: string[];
   }
 }
 

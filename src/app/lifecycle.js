@@ -111,9 +111,14 @@ export function mountAppLifecycle(options) {
     schedulePersistTreeState(currentFilePath, nextTreeState);
   });
   const stopThemeSync = effect(() => {
+    const theme = appState.selectors.getTheme();
+    // Also on <html>: body takes its text color from there, and anything that
+    // inherits it (dialog paragraphs, ...) would otherwise keep the dark theme's
+    // near-white text while the light theme is active.
+    document.documentElement.setAttribute("data-theme", theme);
     const appShell = document.querySelector(".app-shell");
     if (appShell) {
-      appShell.setAttribute("data-theme", appState.selectors.getTheme());
+      appShell.setAttribute("data-theme", theme);
     }
   });
   const stopWindowStateBinding = appState.actions.bindWindowStateSync();

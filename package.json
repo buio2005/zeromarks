@@ -1,7 +1,7 @@
 {
-  "name": "justbookmarks",
+  "name": "zeromarks",
   "private": true,
-  "version": "0.3.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "tauri": "tauri",
@@ -15,7 +15,8 @@
     "test:prepare:dev": "node scripts/use-dev-index.mjs",
     "test:prepare:prod": "node scripts/use-prod-index.mjs",
     "typecheck": "tsc -p jsconfig.json --pretty false && tsc -p jsconfig.tooling.json --pretty false && node --check tests/browser/run-browser.js",
-    "verify": "npm run typecheck && npm test"
+    "verify": "npm run typecheck && npm test",
+    "notices": "node scripts/generate-notices.mjs"
   },
   "devDependencies": {
     "@tauri-apps/api": "^2.11.0",

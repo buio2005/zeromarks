@@ -1,5 +1,6 @@
 // @ts-check
 
+import { t } from "../../shared/i18n/i18n.js";
 import { MoveNode, MoveNodes } from "../../shared/api/api.js";
 import { getErrorMessage } from "../../shared/infra/errors.js";
 import { trapFocusInContainer } from "../../shared/infra/focus.js";
@@ -110,7 +111,7 @@ function createMoveDialog(view, onMountElements) {
           const cancelButton = /** @type {HTMLButtonElement} */ (requireRef(ctx.refs, "cancelButton"));
           const confirmButton = /** @type {HTMLButtonElement} */ (requireRef(ctx.refs, "confirmButton"));
 
-          title.textContent = `Move "${view.label}"`;
+          title.textContent = t('Move "{label}"', { label: view.label });
 
           onMountElements({
             backdrop,
@@ -299,7 +300,7 @@ function createMoveDialogComponent() {
       const cleanup = cleanupCollector();
       let filterTimer = /** @type {number | null} */ (null);
 
-      title.textContent = `Move "${request?.label ?? ""}"`;
+      title.textContent = t('Move "{label}"', { label: request?.label ?? "" });
       filterInput.value = "";
 
       cleanup.add(
@@ -362,7 +363,9 @@ function createMoveDialogComponent() {
               toggle.hidden = !currentFolder.hasChildren;
               toggle.setAttribute("aria-hidden", currentFolder.hasChildren ? "false" : "true");
               toggle.disabled = loadingChildren;
-              toggle.textContent = loadingChildren ? "…" : currentFolder.expanded ? "⌄" : "›";
+              toggle.textContent = loadingChildren ? "…" : "";
+              toggle.classList.toggle("is-loading", loadingChildren);
+              toggle.classList.toggle("is-expanded", Boolean(currentFolder.expanded));
 
               folderIcon.classList.toggle("is-open", Boolean(currentFolder.expanded));
 

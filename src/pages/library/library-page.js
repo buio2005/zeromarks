@@ -1,5 +1,6 @@
 // @ts-check
 
+import { t } from "../../shared/i18n/i18n.js";
 import {
   cleanupCollector,
   effect,
@@ -55,7 +56,7 @@ import {
 function activateLibraryShell(shell) {
   showLibraryFrame(shell);
   shell.searchInput.disabled = false;
-  shell.searchInput.placeholder = "Search bookmarks...";
+  shell.searchInput.placeholder = t("Search bookmarks...");
 }
 
 /**
@@ -104,9 +105,9 @@ function mountLibraryTitlebarMeta(shell) {
     const loading = treeState.selectors.isLoading();
 
     shell.titlebarMeta.textContent = treeError
-      ? treeError
+      ? t(treeError)
       : filePath ||
-        (loading
+        t(loading
           ? "Loading bookmark library..."
           : "Bookmark library");
   });

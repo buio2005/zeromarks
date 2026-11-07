@@ -9,8 +9,11 @@ const groups = [
     title: "Global",
     items: [
       { keys: "Ctrl/Cmd+O", action: "Open file" },
+      { keys: "Ctrl/Cmd+Shift+O", action: "Recent files" },
       { keys: "Ctrl/Cmd+N", action: "Create file" },
       { keys: "Ctrl/Cmd+Shift+I", action: "Import / merge" },
+      { keys: "Ctrl/Cmd+Shift+D", action: "Find duplicates" },
+      { keys: "Ctrl/Cmd+Shift+L", action: "Check for dead links" },
       { keys: "Ctrl/Cmd+F or /", action: "Focus search" },
       { keys: "F6", action: "Cycle focus zones" },
       { keys: "Ctrl/Cmd+Z", action: "Undo" },

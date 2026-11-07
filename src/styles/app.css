@@ -33,3 +33,8 @@
 @import url("../features/detail/styles/detail-surface.css") layer(features);
 @import url("../features/move/move-dialog.css") layer(features);
 @import url("../features/import-merge/import-merge-dialog.css") layer(features);
+@import url("../features/duplicates/duplicates-dialog.css") layer(features);
+@import url("../features/link-check/link-check-dialog.css") layer(features);
+@import url("../features/recent-files/recent-files.css") layer(features);
+@import url("../features/external-change/external-change.css") layer(features);
+@import url("../features/about/about-dialog.css") layer(features);

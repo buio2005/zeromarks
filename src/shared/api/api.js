@@ -20,6 +20,11 @@ import {
   GetHistoryState as HostGetHistoryState,
   GetRootNodes as HostGetRootNodes,
   GetTreeStats as HostGetTreeStats,
+  FindDuplicates as HostFindDuplicates,
+  CheckExternalChange as HostCheckExternalChange,
+  KeepLocalVersion as HostKeepLocalVersion,
+  SortFolder as HostSortFolder,
+  CheckLinks as HostCheckLinks,
   LoadBookmarkFile as HostLoadBookmarkFile,
   LoadFile as HostLoadFile,
   MoveNode as HostMoveNode,
@@ -80,6 +85,7 @@ function normalizeBookmarkMergeItem(item) {
 function normalizeConflictItem(item) {
   return {
     folderPath: item?.folderPath ?? "",
+    existingFolderPath: item?.existingFolderPath ?? "",
     existingTitle: item?.existingTitle ?? "",
     incomingTitle: item?.incomingTitle ?? "",
     url: item?.url ?? "",
@@ -206,6 +212,48 @@ export async function GetTreeStats() {
 }
 
 /**
+ * @param {{ id: string, url: string }[]} targets
+ * @returns {Promise<LinkCheckResult[]>}
+ */
+export async function CheckLinks(targets) {
+  /** @type {any[]} */
+  const results = (await HostCheckLinks(targets)) ?? [];
+  return results.map((result) => ({
+    id: result?.id ?? "",
+    url: result?.url ?? "",
+    status: result?.status ?? "uncertain",
+    httpStatus: result?.httpStatus ?? 0,
+    finalUrl: result?.finalUrl ?? "",
+    message: result?.message ?? "",
+  }));
+}
+
+/** @returns {Promise<"unchanged" | "changed" | "missing">} */
+export async function CheckExternalChange() {
+  return HostCheckExternalChange();
+}
+
+export async function KeepLocalVersion() {
+  await wrapMutation(HostKeepLocalVersion());
+}
+
+/** @returns {Promise<DuplicateGroup[]>} */
+export async function FindDuplicates() {
+  /** @type {any[]} */
+  const groups = (await HostFindDuplicates()) ?? [];
+  return groups.map((group) => ({
+    url: group?.url ?? "",
+    items: (group?.items ?? []).map((/** @type {any} */ item) => ({
+      id: item?.id ?? "",
+      title: item?.title ?? "",
+      url: item?.url ?? "",
+      folderPath: item?.folderPath ?? "",
+      addDate: item?.addDate ?? "",
+    })),
+  }));
+}
+
+/**
  * @param {string} parentFolderId
  * @param {BookmarkCreate} bookmark
  * @returns {Promise<FlatNode>}
@@ -249,6 +297,14 @@ export async function UpdateBookmark(id, patch) {
  */
 export async function UpdateFolderName(id, name) {
   await wrapMutation(HostUpdateFolderName(id, name));
+}
+
+/**
+ * @param {string} folderId
+ * @param {SortOptions} options
+ */
+export async function SortFolder(folderId, options) {
+  await wrapMutation(HostSortFolder(folderId, options));
 }
 
 /** @param {string} id */
@@ -337,6 +393,7 @@ export async function ApplyImportMerge(path) {
     bookmarksAdded: result?.bookmarksAdded ?? 0,
     duplicatesSkipped: result?.duplicatesSkipped ?? 0,
     potentialUpdates: result?.potentialUpdates ?? 0,
+    bookmarksUpdated: result?.bookmarksUpdated ?? 0,
   };
 }
 

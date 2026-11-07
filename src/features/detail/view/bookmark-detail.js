@@ -1,5 +1,6 @@
 // @ts-check
 
+import { t } from "../../../shared/i18n/i18n.js";
 import {
   cleanupCollector,
   fx,
@@ -203,7 +204,7 @@ export function createBookmarkDetail(bookmark) {
           show(titleInput, editing),
           fx(urlLink, (currentURLLink) => {
             currentURLLink.hidden = editing();
-            currentURLLink.textContent = bookmark.bookmark.url || "No URL set";
+            currentURLLink.textContent = bookmark.bookmark.url || t("No URL set");
           }),
           show(urlInputWrap, editing),
           fx(saveButton, (currentSaveButton) => {
@@ -221,7 +222,7 @@ export function createBookmarkDetail(bookmark) {
           fx(faviconButton, (currentFaviconButton) => {
             const active = fetchingFavicon();
             currentFaviconButton.disabled = active || !currentURL().trim();
-            currentFaviconButton.textContent = active ? "Fetching..." : "Fetch Favicon";
+            currentFaviconButton.textContent = t(active ? "Fetching..." : "Fetch Favicon");
           }),
           fx(titleLoading, (currentTitleLoading) => {
             const active = fetchingTitle();
@@ -243,14 +244,14 @@ export function createBookmarkDetail(bookmark) {
             const hasDate = hasRealDate(bookmark.bookmark.addDate);
             currentAddedDate.hidden = !hasDate;
             currentAddedDate.textContent = hasDate
-              ? `Added: ${new Date(bookmark.bookmark.addDate).toLocaleString()}`
+              ? t("Added: {date}", { date: new Date(bookmark.bookmark.addDate).toLocaleString() })
               : "";
           }),
           fx(modifiedDate, (currentModifiedDate) => {
             const hasDate = hasRealDate(bookmark.bookmark.lastModified);
             currentModifiedDate.hidden = !hasDate;
             currentModifiedDate.textContent = hasDate
-              ? `Modified: ${new Date(bookmark.bookmark.lastModified).toLocaleString()}`
+              ? t("Modified: {date}", { date: new Date(bookmark.bookmark.lastModified).toLocaleString() })
               : "";
           }),
           show(notesInput, editing),
@@ -265,7 +266,7 @@ export function createBookmarkDetail(bookmark) {
           fx(detailsError, (currentDetailsError) => {
             const message = detailError();
             currentDetailsError.hidden = message.length === 0;
-            currentDetailsError.textContent = message;
+            currentDetailsError.textContent = t(message);
           }),
           () => metadata.clearScheduledFetch(),
           () => metadata.cancelOutstandingFetches(),

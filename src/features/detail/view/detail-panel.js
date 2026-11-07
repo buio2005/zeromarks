@@ -1,5 +1,6 @@
 // @ts-check
 
+import { t } from "../../../shared/i18n/i18n.js";
 import { createBookmarkDetail } from "./bookmark-detail.js";
 import { createBulkSelectionDetail } from "./bulk-selection-detail.js";
 import { createFolderDetail } from "./folder-detail.js";
@@ -71,11 +72,11 @@ export function mountDetailPanel(root) {
 
     // Update meta text inline -- avoids a second effect.
     if (selectionCount > 1) {
-      meta.textContent = `${selectionCount} items selected`;
+      meta.textContent = t("{count} items selected", { count: selectionCount });
     } else if (!selectedNode) {
-      meta.textContent = "No selection yet";
+      meta.textContent = t("No selection yet");
     } else {
-      meta.textContent = isFolderNode(selectedNode) ? "Folder selected" : "Bookmark selected";
+      meta.textContent = t(isFolderNode(selectedNode) ? "Folder selected" : "Bookmark selected");
     }
   });
 

@@ -73,6 +73,25 @@ body.is-tree-dragging * {
     font-size: 1rem;
 }
 
+/* Chevron drawn as a mask icon: the text glyphs (› ⌄) render unevenly with Windows fonts. */
+.tree-row__toggle::before {
+    content: "";
+    width: 0.8rem;
+    height: 0.8rem;
+    background-color: currentColor;
+    mask: var(--mask-chevron) center / contain no-repeat;
+    -webkit-mask: var(--mask-chevron) center / contain no-repeat;
+    transition: transform 0.12s ease;
+}
+
+.tree-row__toggle.is-expanded::before {
+    transform: rotate(90deg);
+}
+
+.tree-row__toggle.is-loading::before {
+    display: none;
+}
+
 .tree-row__folder-icon,
 .tree-row__bookmark-icon,
 .search-result__icon {

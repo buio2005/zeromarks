@@ -9,7 +9,7 @@ use scraper::{Html, Selector};
 use tauri::State;
 
 use crate::dto::{
-    BookmarkCreateDto, MergeApplyResult, MergePreview, MoveResult, NodeDto, TreeStats,
+    BookmarkCreateDto, DuplicateGroup, MergeApplyResult, MergePreview, MoveResult, NodeDto, TreeStats,
 };
 use crate::models::{BookmarkIndexEntry, BookmarkPatch, FlatNode, HistoryState};
 use crate::state::SharedState;
@@ -26,7 +26,7 @@ struct FaviconRefreshTarget {
 #[cfg(test)]
 static FORCE_SAVE_FAILURE: AtomicBool = AtomicBool::new(false);
 
-fn persist_tree(path: &str, tree: &[crate::models::Node]) -> Result<(), String> {
+fn persist_tree(path: &str, tree: &[crate::models::Node], force_backup: bool) -> Result<(), String> {
     #[cfg(test)]
     if FORCE_SAVE_FAILURE.load(Ordering::Relaxed) {
         return Err("forced save failure".to_string());
@@ -36,7 +36,63 @@ fn persist_tree(path: &str, tree: &[crate::models::Node]) -> Result<(), String> 
         return Ok(());
     }
 
-    bookmarks::save_file(path, tree)
+    bookmarks::save_file_with_backup(path, tree, force_backup)
+}
+
+/// Saves `tree` to the current file. If another program changed the file since we last
+/// loaded or saved it, that version is backed up first (no throttle). Afterwards the
+/// remembered fingerprint matches what we wrote.
+fn save_tracked(state: &mut crate::state::AppState, tree: &[crate::models::Node]) -> Result<(), String> {
+    let changed_outside = state.disk_hash.is_some() && bookmarks::disk_fingerprint(&state.file_path) != state.disk_hash;
+    persist_tree(&state.file_path, tree, changed_outside)?;
+    state.disk_hash = bookmarks::disk_fingerprint(&state.file_path);
+    Ok(())
+}
+
+#[derive(serde::Serialize, Debug, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub enum ExternalChange {
+    Unchanged,
+    Changed,
+    Missing,
+}
+
+/// Has the open file been changed or removed by another program since we last
+/// loaded or saved it?
+#[tauri::command]
+pub fn check_external_change(state: State<'_, SharedState>) -> CommandResult<ExternalChange> {
+    let state = state.lock().map_err(|_| "state lock poisoned".to_string())?;
+    external_change_status(&state)
+}
+
+fn external_change_status(state: &crate::state::AppState) -> CommandResult<ExternalChange> {
+    if state.file_path.is_empty() || state.disk_hash.is_none() {
+        return Ok(ExternalChange::Unchanged);
+    }
+    if !Path::new(&state.file_path).exists() {
+        return Ok(ExternalChange::Missing);
+    }
+    Ok(match bookmarks::disk_fingerprint(&state.file_path) {
+        Some(hash) if Some(hash) == state.disk_hash => ExternalChange::Unchanged,
+        Some(_) => ExternalChange::Changed,
+        // Exists but unreadable right now (e.g. a sync client holds it): ask again later.
+        None => ExternalChange::Unchanged,
+    })
+}
+
+/// "Keep my version": back up the other program's version now, then treat the file as
+/// ours again. Our next save overwrites it.
+#[tauri::command]
+pub fn keep_local_version(state: State<'_, SharedState>) -> CommandResult<()> {
+    let mut state = state.lock().map_err(|_| "state lock poisoned".to_string())?;
+    if Path::new(&state.file_path).exists() {
+        bookmarks::backup_now(&state.file_path).map_err(|e| format!("failed to back up the changed file: {e}"))?;
+    }
+    let tree = state.tree.clone();
+    // Write our version now so the file matches what the app shows.
+    persist_tree(&state.file_path, &tree, false)?;
+    state.disk_hash = bookmarks::disk_fingerprint(&state.file_path);
+    Ok(())
 }
 
 fn commit_snapshot(
@@ -45,7 +101,7 @@ fn commit_snapshot(
     before: Vec<crate::models::Node>,
     after: Vec<crate::models::Node>,
 ) -> Result<(), String> {
-    persist_tree(&state.file_path, &after)?;
+    save_tracked(state, &after)?;
     state.tree = after.clone();
     state.undo_stack.push(SnapshotCommand {
         label: label.to_string(),
@@ -168,11 +224,9 @@ fn fetch_favicon_for_url(client: &Client, page_url: &str) -> CommandResult<Strin
         }
     }
 
-    let google_fallback = format!(
-        "https://www.google.com/s2/favicons?domain={}&sz=32",
-        page_uri.host_str().unwrap_or_default()
-    );
-    fetch_icon_url(client, &google_fallback)
+    // Privacy: no third-party favicon service (it would learn every bookmarked domain).
+    // Only the bookmarked site itself is contacted; without an icon there, none is set.
+    Err("no favicon found on this site".to_string())
 }
 
 #[tauri::command]
@@ -200,6 +254,7 @@ pub fn create_bookmark_file(state: State<'_, SharedState>) -> CommandResult<Stri
     let empty_tree: Vec<crate::models::Node> = Vec::new();
     bookmarks::save_file(&path, &empty_tree)?;
     let mut state = state.lock().map_err(|_| "state lock poisoned".to_string())?;
+    state.disk_hash = bookmarks::disk_fingerprint(&path);
     state.file_path = path.clone();
     state.tree = empty_tree;
     state.undo_stack.clear();
@@ -211,6 +266,7 @@ pub fn create_bookmark_file(state: State<'_, SharedState>) -> CommandResult<Stri
 pub fn load_bookmark_file(path: String, state: State<'_, SharedState>) -> CommandResult<()> {
     let tree = bookmarks::load_file(&path)?;
     let mut state = state.lock().map_err(|_| "state lock poisoned".to_string())?;
+    state.disk_hash = bookmarks::disk_fingerprint(&path);
     state.file_path = path;
     state.tree = tree;
     state.undo_stack.clear();
@@ -222,6 +278,7 @@ pub fn load_bookmark_file(path: String, state: State<'_, SharedState>) -> Comman
 pub fn load_file(path: String, state: State<'_, SharedState>) -> CommandResult<()> {
     let tree = bookmarks::load_file(&path)?;
     let mut state = state.lock().map_err(|_| "state lock poisoned".to_string())?;
+    state.disk_hash = bookmarks::disk_fingerprint(&path);
     state.file_path = path;
     state.tree = tree;
     state.undo_stack.clear();
@@ -272,6 +329,34 @@ pub fn get_all_folders(state: State<'_, SharedState>) -> CommandResult<Vec<NodeD
 pub fn get_tree_stats(state: State<'_, SharedState>) -> CommandResult<TreeStats> {
     let state = state.lock().map_err(|_| "state lock poisoned".to_string())?;
     Ok(bookmarks::tree_stats(&state.tree))
+}
+
+/// Async so the window stays responsive; the network work runs on its own OS thread
+/// (reqwest's blocking client must not run inside the async runtime).
+#[tauri::command]
+pub async fn check_links(targets: Vec<crate::link_check::LinkCheckTarget>) -> CommandResult<Vec<crate::link_check::LinkCheckResult>> {
+    tauri::async_runtime::spawn_blocking(move || {
+        std::thread::spawn(move || crate::link_check::check_links(&targets, Duration::from_secs(12)))
+            .join()
+            .map_err(|_| "link check crashed".to_string())?
+    })
+    .await
+    .map_err(|e| format!("link check failed: {e}"))?
+}
+
+#[tauri::command]
+pub fn sort_folder(folder_id: String, options: crate::sorting::SortOptions, state: State<'_, SharedState>) -> CommandResult<()> {
+    let mut state = state.lock().map_err(|_| "state lock poisoned".to_string())?;
+    let before = state.tree.clone();
+    let mut next_tree = before.clone();
+    crate::sorting::sort_folder(&mut next_tree, &folder_id, options)?;
+    commit_snapshot(&mut state, "Sort Folder", before, next_tree)
+}
+
+#[tauri::command]
+pub fn find_duplicates(state: State<'_, SharedState>) -> CommandResult<Vec<DuplicateGroup>> {
+    let state = state.lock().map_err(|_| "state lock poisoned".to_string())?;
+    Ok(bookmarks::find_duplicates(&state.tree))
 }
 
 #[tauri::command]
@@ -480,8 +565,9 @@ pub fn get_history_state(state: State<'_, SharedState>) -> CommandResult<History
 pub fn undo(state: State<'_, SharedState>) -> CommandResult<HistoryState> {
     let mut state = state.lock().map_err(|_| "state lock poisoned".to_string())?;
     let command = state.undo_stack.pop().ok_or_else(|| "nothing to undo".to_string())?;
-    if !state.file_path.is_empty() {
-        bookmarks::save_file(&state.file_path, &command.before)?;
+    if let Err(err) = save_tracked(&mut state, &command.before) {
+        state.undo_stack.push(command);
+        return Err(err);
     }
     state.tree = command.before.clone();
     state.redo_stack.push(command);
@@ -492,7 +578,10 @@ pub fn undo(state: State<'_, SharedState>) -> CommandResult<HistoryState> {
 pub fn redo(state: State<'_, SharedState>) -> CommandResult<HistoryState> {
     let mut state = state.lock().map_err(|_| "state lock poisoned".to_string())?;
     let command = state.redo_stack.pop().ok_or_else(|| "nothing to redo".to_string())?;
-    persist_tree(&state.file_path, &command.after)?;
+    if let Err(err) = save_tracked(&mut state, &command.after) {
+        state.redo_stack.push(command);
+        return Err(err);
+    }
     state.tree = command.after.clone();
     state.undo_stack.push(command);
     Ok(state.history_state())
@@ -532,6 +621,45 @@ mod tests {
         assert_eq!(state.tree, before);
         assert!(state.undo_stack.is_empty());
         assert!(state.redo_stack.is_empty());
+    }
+
+    #[test]
+    fn external_edits_are_detected_and_backed_up_before_overwrite() {
+        let dir = std::env::temp_dir().join(format!("jb-external-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+        let file = dir.join("bookmarks.html");
+        let path = file.to_string_lossy().into_owned();
+
+        let tree = sample_tree();
+        bookmarks::save_file(&path, &tree).unwrap();
+        let mut state = AppState {
+            file_path: path.clone(),
+            tree: tree.clone(),
+            disk_hash: bookmarks::disk_fingerprint(&path),
+            ..AppState::default()
+        };
+        assert_eq!(external_change_status(&state).unwrap(), ExternalChange::Unchanged);
+
+        // Our own save is not reported as an outside change.
+        save_tracked(&mut state, &tree).unwrap();
+        assert_eq!(external_change_status(&state).unwrap(), ExternalChange::Unchanged);
+
+        // Another program edits the file.
+        std::fs::write(&file, "<!DOCTYPE NETSCAPE-Bookmark-file-1>\n<DL><p>\n</DL><p>\n").unwrap();
+        assert_eq!(external_change_status(&state).unwrap(), ExternalChange::Changed);
+
+        // Saving over it keeps the outside version as a backup, even within the throttle window.
+        let before = std::fs::read_dir(dir.join(bookmarks::BACKUP_DIR_NAME)).map(|d| d.count()).unwrap_or(0);
+        save_tracked(&mut state, &tree).unwrap();
+        let backups: Vec<_> = std::fs::read_dir(dir.join(bookmarks::BACKUP_DIR_NAME)).unwrap().flatten().collect();
+        assert!(backups.len() > before || backups.iter().any(|b| std::fs::read_to_string(b.path()).unwrap().contains("<DL><p>\n</DL>")));
+        assert!(backups.iter().any(|b| std::fs::read_to_string(b.path()).unwrap().contains("<DL><p>\n</DL>")));
+        assert_eq!(external_change_status(&state).unwrap(), ExternalChange::Unchanged);
+
+        std::fs::remove_file(&file).unwrap();
+        assert_eq!(external_change_status(&state).unwrap(), ExternalChange::Missing);
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     #[test]

@@ -7,6 +7,9 @@ import { treeState } from "../tree/state/tree-state.js";
 import { uiState } from "../../shared/state/ui-state.js";
 import { appState } from "../../shared/state/app-state.js";
 import { importMergeState } from "../import-merge/import-merge-state.js";
+import { duplicatesState } from "../duplicates/duplicates-state.js";
+import { linkCheckState } from "../link-check/link-check-state.js";
+import { recentFilesMenu } from "../recent-files/recent-files.js";
 import {
   focusDetail,
   focusDetailForSelection,
@@ -172,6 +175,11 @@ export function mountGlobalShortcuts(options) {
       return;
     }
 
+    if (key === "o" && event.shiftKey) {
+      event.preventDefault();
+      recentFilesMenu.toggle();
+      return;
+    }
     if (key === "o") {
       event.preventDefault();
       void options.openFile();
@@ -185,6 +193,16 @@ export function mountGlobalShortcuts(options) {
     if (key === "f") {
       event.preventDefault();
       options.focusSearch();
+      return;
+    }
+    if (key === "l" && event.shiftKey) {
+      event.preventDefault();
+      linkCheckState.actions.openLinkCheck();
+      return;
+    }
+    if (key === "d" && event.shiftKey) {
+      event.preventDefault();
+      void duplicatesState.actions.openDuplicates();
       return;
     }
     if (key === "i" && event.shiftKey) {

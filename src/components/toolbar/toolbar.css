@@ -46,6 +46,21 @@
   -webkit-mask-image: var(--mask-file-plus);
 }
 
+.toolbar-action-icon--duplicates::before {
+  mask-image: var(--mask-copy);
+  -webkit-mask-image: var(--mask-copy);
+}
+
+.toolbar-action-icon--link-check::before {
+  mask-image: var(--mask-link-check);
+  -webkit-mask-image: var(--mask-link-check);
+}
+
+.toolbar-action-icon--recent::before {
+  mask-image: var(--mask-recent);
+  -webkit-mask-image: var(--mask-recent);
+}
+
 .toolbar-action-icon--import::before {
   mask-image: var(--mask-file-import);
   -webkit-mask-image: var(--mask-file-import);

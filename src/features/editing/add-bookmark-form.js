@@ -1,5 +1,6 @@
 // @ts-check
 
+import { t } from "../../shared/i18n/i18n.js";
 import {
   AddBookmark,
   FetchFavicon,
@@ -429,7 +430,7 @@ export function createAddBookmarkForm(options) {
             fx(error, (currentError) => {
               const message = errorMessage();
               currentError.hidden = message.length === 0;
-              currentError.textContent = message;
+              currentError.textContent = t(message);
             }),
             fx(submit, (currentSubmit) => {
               currentSubmit.disabled = busy();

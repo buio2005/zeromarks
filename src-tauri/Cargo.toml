@@ -1,8 +1,8 @@
 [package]
-name = "justbookmarks"
-version = "0.3.0"
-description = "A simple bookmark manager"
-authors = ["Sellsword Software"]
+name = "zeromarks"
+version = "1.0.0"
+description = "ZeroMarks: a private, local bookmark manager"
+authors = ["Sellsword Software", "TivuStream"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

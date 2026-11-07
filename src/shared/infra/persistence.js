@@ -2,6 +2,7 @@
 
 const STORAGE_KEY = "justbookmarks.ui-state.v1";
 const MAX_FILE_STATES = 10;
+export const MAX_RECENT_FILES = 8;
 
 /** @type {PersistedUIState} */
 const defaultState = {
@@ -10,7 +11,43 @@ const defaultState = {
   window: null,
   files: {},
   theme: "dark",
+  recentFiles: [],
 };
+
+/**
+ * Paths are compared ignoring case and slash direction (Windows paths).
+ *
+ * @param {string} path
+ * @returns {string}
+ */
+function pathKey(path) {
+  return path.replace(/\\/g, "/").toLowerCase();
+}
+
+/**
+ * Returns the list with `path` moved to the front, without duplicates, capped.
+ *
+ * @param {string[]} list
+ * @param {string} path
+ * @returns {string[]}
+ */
+export function withRecentFile(list, path) {
+  if (!path) {
+    return list.slice(0, MAX_RECENT_FILES);
+  }
+  const key = pathKey(path);
+  return [path, ...list.filter((item) => pathKey(item) !== key)].slice(0, MAX_RECENT_FILES);
+}
+
+/**
+ * @param {string[]} list
+ * @param {string} path
+ * @returns {string[]}
+ */
+export function withoutRecentFile(list, path) {
+  const key = pathKey(path);
+  return list.filter((item) => pathKey(item) !== key);
+}
 
 /**
  * @returns {boolean}
@@ -60,6 +97,20 @@ function sanitizeState(raw) {
   }
 
   const windowState = candidate.window;
+  const lastOpenedFile = typeof candidate.lastOpenedFile === "string" ? candidate.lastOpenedFile : "";
+  /** @type {string[]} */
+  let recentFiles = [];
+  if (Array.isArray(candidate.recentFiles)) {
+    for (const item of candidate.recentFiles) {
+      if (typeof item === "string" && item) {
+        recentFiles = withoutRecentFile(recentFiles, item).concat(item);
+      }
+    }
+    recentFiles = recentFiles.slice(0, MAX_RECENT_FILES);
+  } else if (lastOpenedFile) {
+    // Older saved state had no list yet: start it with the last opened file.
+    recentFiles = [lastOpenedFile];
+  }
   return {
     lastOpenedFile:
       typeof candidate.lastOpenedFile === "string"
@@ -85,6 +136,7 @@ function sanitizeState(raw) {
       (candidate.theme === "light" || candidate.theme === "dark")
         ? candidate.theme
         : defaultState.theme,
+    recentFiles,
   };
 }
 
@@ -129,7 +181,34 @@ export function savePersistedUIState(state) {
  */
 export function setLastOpenedFile(path) {
   const state = loadPersistedUIState();
-  const nextState = { ...state, lastOpenedFile: path };
+  const nextState = {
+    ...state,
+    lastOpenedFile: path,
+    recentFiles: withRecentFile(state.recentFiles, path),
+  };
+  savePersistedUIState(nextState);
+  return nextState;
+}
+
+/**
+ * @param {string} path
+ * @returns {PersistedUIState}
+ */
+export function removeRecentFile(path) {
+  const state = loadPersistedUIState();
+  const nextState = { ...state, recentFiles: withoutRecentFile(state.recentFiles, path) };
+  savePersistedUIState(nextState);
+  return nextState;
+}
+
+/**
+ * Empties the list but keeps the file that is open now (if any).
+ *
+ * @returns {PersistedUIState}
+ */
+export function clearRecentFiles() {
+  const state = loadPersistedUIState();
+  const nextState = { ...state, recentFiles: state.lastOpenedFile ? [state.lastOpenedFile] : [] };
   savePersistedUIState(nextState);
   return nextState;
 }

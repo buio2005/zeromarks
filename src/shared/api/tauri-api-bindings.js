@@ -69,6 +69,34 @@ export async function GetTreeStats() {
 }
 
 /**
+ * @param {string} folderId
+ * @param {{ mode: string, foldersFirst: boolean, recursive: boolean }} options
+ */
+export async function SortFolder(folderId, options) {
+  await invoke("sort_folder", { folderId, options });
+}
+
+/** @returns {Promise<"unchanged" | "changed" | "missing">} */
+export async function CheckExternalChange() {
+  return invoke("check_external_change");
+}
+
+export async function KeepLocalVersion() {
+  await invoke("keep_local_version");
+}
+
+export async function FindDuplicates() {
+  return invoke("find_duplicates");
+}
+
+/**
+ * @param {{ id: string, url: string }[]} targets
+ */
+export async function CheckLinks(targets) {
+  return invoke("check_links", { targets });
+}
+
+/**
  * @param {string} parentID
  * @param {BookmarkCreate} bm
  */
